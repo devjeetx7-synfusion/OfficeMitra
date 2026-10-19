@@ -1,0 +1,206 @@
+package com.officemitra.app.feature.auth
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.ErrorColor
+import com.officemitra.app.core.theme.PrimaryLight
+import com.officemitra.app.core.theme.SuccessColor
+import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.theme.WarningColor
+
+@Composable
+fun RegisterScreen(
+    onNavigateToHome: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onBackClick: () -> Unit,
+    viewModel: RegisterViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        OfficeMitraTopBar(
+            title = "Create Account",
+            showBackButton = true,
+            onBackClick = onBackClick
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = "Join Office Mitra",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "Create your account to start managing workforce tasks.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondaryLight
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                InfoBanner(message = "Demo Registration: Local account creation mode.")
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                AppTextField(
+                    value = uiState.fullName,
+                    onValueChange = viewModel::onFullNameChanged,
+                    label = "Full Name",
+                    placeholder = "Alex Morgan",
+                    leadingIcon = Icons.Outlined.Person,
+                    isError = uiState.nameError != null,
+                    errorMessage = uiState.nameError
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                AppTextField(
+                    value = uiState.email,
+                    onValueChange = viewModel::onEmailChanged,
+                    label = "Email Address",
+                    placeholder = "alex.morgan@officemitra.com",
+                    leadingIcon = Icons.Outlined.Email,
+                    isError = uiState.emailError != null,
+                    errorMessage = uiState.emailError
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                AppTextField(
+                    value = uiState.mobileNumber,
+                    onValueChange = viewModel::onMobileNumberChanged,
+                    label = "Mobile Number",
+                    placeholder = "+1 555-019-2834",
+                    leadingIcon = Icons.Outlined.Phone,
+                    isError = uiState.mobileError != null,
+                    errorMessage = uiState.mobileError
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                PasswordTextField(
+                    value = uiState.password,
+                    onValueChange = viewModel::onPasswordChanged,
+                    label = "Password",
+                    isError = uiState.passwordError != null,
+                    errorMessage = uiState.passwordError
+                )
+
+                // Password Strength Indicator
+                if (uiState.password.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val strength = when {
+                        uiState.password.length < 6 -> "Weak" to ErrorColor
+                        uiState.password.length < 10 -> "Medium" to WarningColor
+                        else -> "Strong" to SuccessColor
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(start = 4.dp)
+                    ) {
+                        Text(text = "Password Strength: ", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                        Text(text = strength.first, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = strength.second)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                PasswordTextField(
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChanged,
+                    label = "Confirm Password",
+                    isError = uiState.confirmPasswordError != null,
+                    errorMessage = uiState.confirmPasswordError
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(
+                        checked = uiState.acceptTerms,
+                        onCheckedChange = viewModel::onAcceptTermsChanged,
+                        colors = CheckboxDefaults.colors(checkedColor = PrimaryLight)
+                    )
+                    Text(
+                        text = "I accept the Terms and Conditions",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                if (uiState.termsError != null) {
+                    Text(
+                        text = uiState.termsError!!,
+                        color = ErrorColor,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                PrimaryButton(
+                    text = "Register",
+                    onClick = { viewModel.register(onNavigateToHome) },
+                    isLoading = uiState.isLoading
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Already have an account?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondaryLight
+                )
+                TextButton(onClick = onNavigateToLogin) {
+                    Text(
+                        text = "Log In",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = PrimaryLight,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
