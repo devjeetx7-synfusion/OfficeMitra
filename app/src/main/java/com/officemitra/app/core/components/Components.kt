@@ -288,9 +288,9 @@ fun AppTextField(
                 errorBorderColor = ErrorColor
             )
         )
-        if (isError && !errorMessage.isNull_or_Empty()) {
+        if (isError && !errorMessage.isNullOrEmpty()) {
             Text(
-                text = errorMessage,
+                text = errorMessage!!,
                 color = ErrorColor,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 4.dp, top = 4.dp)
@@ -298,8 +298,6 @@ fun AppTextField(
         }
     }
 }
-
-private fun String?.isNull_or_Empty(): Boolean = this == null || this.isEmpty()
 
 @Composable
 fun PasswordTextField(
@@ -378,7 +376,7 @@ fun EmployeeAvatar(
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
-        if (!imageUrl.isNull_or_Empty()) {
+        if (!imageUrl.isNullOrEmpty()) {
             AsyncImage(
                 model = imageUrl,
                 contentDescription = name,

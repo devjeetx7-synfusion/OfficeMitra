@@ -21,6 +21,7 @@ import com.officemitra.app.feature.leave.ApplyLeaveScreen
 import com.officemitra.app.feature.leave.LeaveDetailsScreen
 import com.officemitra.app.feature.leave.LeaveScreen
 import com.officemitra.app.feature.notifications.NotificationsScreen
+import com.officemitra.app.feature.onboarding.OnboardingScreen
 import com.officemitra.app.feature.profile.*
 import com.officemitra.app.feature.salary.SalaryPdfViewerScreen
 import com.officemitra.app.feature.salary.SalarySlipsScreen
