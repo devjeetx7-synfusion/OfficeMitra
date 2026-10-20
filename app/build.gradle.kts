@@ -13,7 +13,7 @@ android {
         applicationId = "com.officemitra.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        versionCode = project.findProperty("VERSION_CODE")?.toString()?.toIntOrNull() ?: 1
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -24,7 +24,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(project.findProperty("KEYSTORE_FILE") as String? ?: "../test-keystore.jks")
+            storeFile = file(project.findProperty("KEYSTORE_FILE") as String? ?: "${rootProject.projectDir}/test-keystore.jks")
             storePassword = project.findProperty("KEYSTORE_PASSWORD") as String? ?: "android"
             keyAlias = project.findProperty("KEY_ALIAS") as String? ?: "testkey"
             keyPassword = project.findProperty("KEY_PASSWORD") as String? ?: "android"
