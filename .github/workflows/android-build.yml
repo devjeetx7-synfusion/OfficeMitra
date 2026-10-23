@@ -1,8 +1,10 @@
 name: Android Build APK
 
 on:
-  push:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Signed APK with Gradle
-        run: ./gradlew assembleRelease -PVERSION_CODE=${{ github.run_number }}
+        run: ./gradlew assembleRelease -PVERSION_CODE=${{ github.run_number }} --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
