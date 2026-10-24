@@ -14,10 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.ErrorColor
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.SuccessColor
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun ApprovalsScreen(
@@ -48,116 +44,105 @@ fun ApprovalsScreen(
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
-            // Approver Role Permission Toggle Header
+            // Approver Role Toggle Info Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(14.dp)
+                        .padding(16.dp)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(text = "Manager Approver Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(
-                            text = if (uiState.currentUser.isAuthorizedApprover) "Authorized to approve requests" else "Normal Employee (Read-only view)",
+                            text = "Approver Role Mode",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = if (uiState.currentUser.isAuthorizedApprover) "Authorized Approver (Manager Role)" else "Standard Employee (View Only)",
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondaryLight
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     Switch(
                         checked = uiState.currentUser.isAuthorizedApprover,
                         onCheckedChange = viewModel::toggleApproverRole,
-                        colors = SwitchDefaults.colors(checkedThumbColor = PrimaryLight)
+                        colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = MaterialTheme.colorScheme.surface
             ) {
-                Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("Pending") })
-                Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("Approved") })
-                Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("Rejected") })
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = {
+                        Text(
+                            text = "Pending",
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium
+                        )
+                    }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = {
+                        Text(
+                            text = "Approved",
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium
+                        )
+                    }
+                )
+                Tab(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    text = {
+                        Text(
+                            text = "Rejected",
+                            fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Medium
+                        )
+                    }
+                )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (filteredRequests.isEmpty()) {
                 EmptyState(
                     title = "No $filterStatus Approvals",
-                    description = "There are no pending approval requests in this category."
+                    description = "There are no approval requests under $filterStatus status."
                 )
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(filteredRequests) { request ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigateToDetails(request.id) },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        EmployeeAvatar(imageUrl = null, name = request.employeeName, size = 36)
-                                        Spacer(modifier = Modifier.width(10.dp))
-                                        Column {
-                                            Text(text = request.employeeName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                            Text(text = "${request.department} | ${request.employeeId}", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
-                                        }
-                                    }
-                                    StatusBadge(status = request.status)
-                                }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(text = request.requestType, style = MaterialTheme.typography.labelMedium, color = PrimaryLight)
-                                Text(text = request.details, style = MaterialTheme.typography.bodyMedium)
-
-                                // Approver Action Buttons
-                                if (uiState.currentUser.isAuthorizedApprover && request.status.equals("Pending", ignoreCase = true)) {
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Button(
-                                            onClick = { viewModel.updateApprovalStatus(request.id, true) },
-                                            modifier = Modifier.weight(1f).height(38.dp),
-                                            colors = ButtonDefaults.buttonColors(containerColor = SuccessColor),
-                                            shape = RoundedCornerShape(8.dp)
-                                        ) {
-                                            Text("Approve", style = MaterialTheme.typography.labelMedium)
-                                        }
-                                        OutlinedButton(
-                                            onClick = { viewModel.updateApprovalStatus(request.id, false) },
-                                            modifier = Modifier.weight(1f).height(38.dp),
-                                            shape = RoundedCornerShape(8.dp)
-                                        ) {
-                                            Text("Reject", style = MaterialTheme.typography.labelMedium, color = ErrorColor)
-                                        }
-                                    }
-                                } else if (!uiState.currentUser.isAuthorizedApprover && request.status.equals("Pending", ignoreCase = true)) {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(text = "Approval permission required to act on this request.", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
-                                }
-                            }
-                        }
+                        ApprovalCard(
+                            employeeName = request.employeeName,
+                            employeeId = request.employeeId,
+                            department = request.department,
+                            requestType = request.requestType,
+                            requestDate = request.requestDate,
+                            details = request.details,
+                            status = request.status,
+                            onApproveClick = { viewModel.updateApprovalStatus(request.id, true) },
+                            onRejectClick = { viewModel.updateApprovalStatus(request.id, false) },
+                            isAuthorizedApprover = uiState.currentUser.isAuthorizedApprover,
+                            modifier = Modifier.clickable { onNavigateToDetails(request.id) }
+                        )
                     }
                 }
             }

@@ -14,8 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun LoginScreen(
@@ -49,7 +47,8 @@ fun LoginScreen(
                 Text(
                     text = "Welcome Back!",
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -57,7 +56,7 @@ fun LoginScreen(
                 Text(
                     text = "Log in using your registered email or mobile number.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -68,7 +67,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                AppTextField(
+                FormTextField(
                     value = uiState.emailOrPhone,
                     onValueChange = viewModel::onEmailOrPhoneChanged,
                     label = "Email or Mobile Number",
@@ -98,11 +97,12 @@ fun LoginScreen(
                         Checkbox(
                             checked = uiState.rememberMe,
                             onCheckedChange = viewModel::onRememberMeChanged,
-                            colors = CheckboxDefaults.colors(checkedColor = PrimaryLight)
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                         Text(
                             text = "Remember Me",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
@@ -110,7 +110,7 @@ fun LoginScreen(
                         Text(
                             text = "Forgot Password?",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = PrimaryLight,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -135,13 +135,13 @@ fun LoginScreen(
                 Text(
                     text = "Don't have an account?",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(onClick = onNavigateToRegister) {
                     Text(
                         text = "Create Account",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = PrimaryLight,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 }

@@ -12,14 +12,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun AttendanceCorrectionScreen(
     onBackClick: () -> Unit,
     viewModel: AttendanceViewModel = hiltViewModel()
 ) {
-    var date by remember { mutableStateOf("03 May 2024") }
+    var date by remember { mutableStateOf("03 May") }
     var requestedTime by remember { mutableStateOf("09:00 AM - 06:00 PM") }
     var reason by remember { mutableStateOf("") }
     var isSubmitted by remember { mutableStateOf(false) }
@@ -45,20 +44,21 @@ fun AttendanceCorrectionScreen(
                 Text(
                     text = "Submit Correction Request",
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Request a punch time adjustment for missing or incorrect records.",
+                    text = "Request a punch time adjustment for missing or incorrect attendance records.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                AppTextField(
+                FormTextField(
                     value = date,
                     onValueChange = { date = it },
                     label = "Date",
@@ -67,7 +67,7 @@ fun AttendanceCorrectionScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                AppTextField(
+                FormTextField(
                     value = requestedTime,
                     onValueChange = { requestedTime = it },
                     label = "Requested Punch Timing",
@@ -76,11 +76,11 @@ fun AttendanceCorrectionScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                AppTextField(
+                FormTextField(
                     value = reason,
                     onValueChange = { reason = it },
                     label = "Reason for Correction",
-                    placeholder = "e.g., System glitch during punch out.",
+                    placeholder = "e.g., System update prevented punch out.",
                     singleLine = false
                 )
 
