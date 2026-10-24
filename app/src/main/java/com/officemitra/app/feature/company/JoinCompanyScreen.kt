@@ -23,8 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun JoinCompanyScreen(
@@ -55,13 +53,13 @@ fun JoinCompanyScreen(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(PrimaryLight.copy(alpha = 0.1f)),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Business,
                     contentDescription = null,
-                    tint = PrimaryLight,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -71,7 +69,8 @@ fun JoinCompanyScreen(
             Text(
                 text = "Enter Company Code",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -79,7 +78,7 @@ fun JoinCompanyScreen(
             Text(
                 text = "Get your company code from your HR department.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondaryLight
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -90,7 +89,7 @@ fun JoinCompanyScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            AppTextField(
+            FormTextField(
                 value = uiState.companyCode,
                 onValueChange = viewModel::onCompanyCodeChanged,
                 label = "Company Code",
@@ -105,23 +104,41 @@ fun JoinCompanyScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "Company Preview Found", style = MaterialTheme.typography.labelMedium, color = PrimaryLight)
+                        Text(
+                            text = "Company Preview Found",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = company.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(text = company.address, style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
-                        Text(text = "${company.totalEmployees} Employees", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                        Text(
+                            text = company.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = company.address,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${company.totalEmployees} Employees",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AppTextField(
+            FormTextField(
                 value = uiState.employeeId,
                 onValueChange = viewModel::onEmployeeIdChanged,
                 label = "Employee ID (Optional)",
@@ -131,7 +148,7 @@ fun JoinCompanyScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AppTextField(
+            FormTextField(
                 value = uiState.fullName,
                 onValueChange = viewModel::onFullNameChanged,
                 label = "Full Name",
@@ -140,7 +157,7 @@ fun JoinCompanyScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AppTextField(
+            FormTextField(
                 value = uiState.mobileNumber,
                 onValueChange = viewModel::onMobileChanged,
                 label = "Registered Mobile Number",

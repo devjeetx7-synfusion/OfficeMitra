@@ -13,8 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun AppSettingsScreen(
@@ -35,13 +33,19 @@ fun AppSettingsScreen(
         )
 
         Column(modifier = Modifier.padding(20.dp)) {
-            Text(text = "Appearance Theme", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Appearance Theme",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
             Spacer(modifier = Modifier.height(12.dp))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     ThemeOptionRow(
@@ -76,11 +80,16 @@ private fun ThemeOptionRow(title: String, selected: Boolean, onClick: () -> Unit
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         RadioButton(
             selected = selected,
             onClick = onClick,
-            colors = RadioButtonDefaults.colors(selectedColor = PrimaryLight)
+            colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
         )
     }
 }

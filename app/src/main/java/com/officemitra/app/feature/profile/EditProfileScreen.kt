@@ -15,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun EditProfileScreen(
@@ -47,17 +46,22 @@ fun EditProfileScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = "Update Personal Info", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Update Personal Info",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Role, Company Code, and Employee ID are locked by HR policy.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                AppTextField(
+                FormTextField(
                     value = name,
                     onValueChange = { name = it },
                     label = "Full Name",
@@ -66,7 +70,7 @@ fun EditProfileScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                AppTextField(
+                FormTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = "Email Address",
@@ -75,7 +79,7 @@ fun EditProfileScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                AppTextField(
+                FormTextField(
                     value = phone,
                     onValueChange = { phone = it },
                     label = "Mobile Number",

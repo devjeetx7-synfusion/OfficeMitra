@@ -14,11 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.officemitra.app.core.components.GradientPrimaryButton
 import com.officemitra.app.core.components.OutlineButton
-import com.officemitra.app.core.components.PrimaryButton
 import com.officemitra.app.core.components.SecondaryButton
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.theme.PrimaryGradient
 
 @Composable
 fun WelcomeScreen(
@@ -45,7 +44,7 @@ fun WelcomeScreen(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(PrimaryLight),
+                    .background(PrimaryGradient),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -56,20 +55,21 @@ fun WelcomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             Text(
                 text = "Office Mitra",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Smart Workforce Management System",
+                text = "Smart Workforce Management SaaS",
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextSecondaryLight,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
@@ -79,7 +79,7 @@ fun WelcomeScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            PrimaryButton(
+            GradientPrimaryButton(
                 text = "Log In to Account",
                 onClick = onNavigateToLogin
             )
@@ -95,7 +95,7 @@ fun WelcomeScreen(
             )
         }
 
-        // Demo Footer
+        // Footer
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -104,7 +104,7 @@ fun WelcomeScreen(
                 Text(
                     text = "Privacy Policy & Terms of Service (Demo Links)",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

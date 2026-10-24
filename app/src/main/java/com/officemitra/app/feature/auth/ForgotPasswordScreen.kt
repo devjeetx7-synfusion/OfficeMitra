@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun ForgotPasswordScreen(
@@ -40,7 +39,8 @@ fun ForgotPasswordScreen(
                 Text(
                     text = "Reset Your Password",
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -48,13 +48,13 @@ fun ForgotPasswordScreen(
                 Text(
                     text = "Enter your registered email address to receive password reset instructions.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 if (!isSubmitted) {
-                    AppTextField(
+                    FormTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = "Email Address",

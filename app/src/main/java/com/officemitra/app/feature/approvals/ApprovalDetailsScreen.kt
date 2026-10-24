@@ -10,9 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.ErrorColor
-import com.officemitra.app.core.theme.SuccessColor
-import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.theme.SuccessLight
 
 @Composable
 fun ApprovalDetailsScreen(
@@ -44,7 +42,7 @@ fun ApprovalDetailsScreen(
             request?.let { req ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
@@ -53,29 +51,61 @@ fun ApprovalDetailsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = req.employeeName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                            StatusBadge(status = req.status)
+                            Text(
+                                text = req.employeeName,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            StatusChip(status = req.status)
                         }
 
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text(text = "Type: ${req.requestType}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                        Text(text = "Date: ${req.requestDate}", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                        Text(
+                            text = "Type: ${req.requestType}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Date: ${req.requestDate}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(text = "Details:", style = MaterialTheme.typography.labelMedium, color = TextSecondaryLight)
-                        Text(text = req.details, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = "Details:",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = req.details,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
 
                         if (req.decisionComment != null) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(text = "Decision Comment:", style = MaterialTheme.typography.labelMedium, color = TextSecondaryLight)
-                            Text(text = req.decisionComment, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text = "Decision Comment:",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = req.decisionComment,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         } else if (uiState.currentUser.isAuthorizedApprover && req.status.equals("Pending", ignoreCase = true)) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            AppTextField(
+                            FormTextField(
                                 value = comment,
                                 onValueChange = { comment = it },
-                                label = "Add Approver Comment",
-                                placeholder = "Enter reason or comments..."
+                                label = "Decision Comment",
+                                placeholder = "Enter reason or feedback..."
                             )
                         }
                     }
@@ -87,25 +117,27 @@ fun ApprovalDetailsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    OutlinedButton(
+                        onClick = {
+                            request?.let { viewModel.updateApprovalStatus(it.id, false, comment) }
+                            onBackClick()
+                        },
+                        modifier = Modifier.weight(1f).height(50.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Reject", fontWeight = FontWeight.Bold)
+                    }
                     Button(
                         onClick = {
                             request?.let { viewModel.updateApprovalStatus(it.id, true, comment) }
                             onBackClick()
                         },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SuccessColor)
+                        modifier = Modifier.weight(1f).height(50.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SuccessLight, contentColor = androidx.compose.ui.graphics.Color.White)
                     ) {
-                        Text("Approve")
-                    }
-                    Button(
-                        onClick = {
-                            request?.let { viewModel.updateApprovalStatus(it.id, false, comment) }
-                            onBackClick()
-                        },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = ErrorColor)
-                    ) {
-                        Text("Reject")
+                        Text("Approve", fontWeight = FontWeight.Bold)
                     }
                 }
             } else {

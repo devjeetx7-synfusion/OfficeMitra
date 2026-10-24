@@ -7,22 +7,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Pending
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.ErrorColor
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.SuccessColor
-import com.officemitra.app.core.theme.TextSecondaryLight
-import com.officemitra.app.core.theme.WarningColor
+import com.officemitra.app.core.theme.*
 
 @Composable
 fun RegistrationStatusScreen(
@@ -50,17 +44,17 @@ fun RegistrationStatusScreen(
             Tab(
                 selected = selectedStatusTab == 0,
                 onClick = { selectedStatusTab = 0 },
-                text = { Text("Pending") }
+                text = { Text("Pending", fontWeight = if (selectedStatusTab == 0) FontWeight.Bold else FontWeight.Medium) }
             )
             Tab(
                 selected = selectedStatusTab == 1,
                 onClick = { selectedStatusTab = 1 },
-                text = { Text("Approved") }
+                text = { Text("Approved", fontWeight = if (selectedStatusTab == 1) FontWeight.Bold else FontWeight.Medium) }
             )
             Tab(
                 selected = selectedStatusTab == 2,
                 onClick = { selectedStatusTab = 2 },
-                text = { Text("Rejected") }
+                text = { Text("Rejected", fontWeight = if (selectedStatusTab == 2) FontWeight.Bold else FontWeight.Medium) }
             )
         }
 
@@ -83,13 +77,13 @@ fun RegistrationStatusScreen(
                             modifier = Modifier
                                 .size(90.dp)
                                 .clip(CircleShape)
-                                .background(WarningColor.copy(alpha = 0.15f)),
+                                .background(WarningLight.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.Pending,
+                                imageVector = Icons.Outlined.CheckCircle,
                                 contentDescription = "Pending",
-                                tint = WarningColor,
+                                tint = WarningLight,
                                 modifier = Modifier.size(48.dp)
                             )
                         }
@@ -99,7 +93,8 @@ fun RegistrationStatusScreen(
                         Text(
                             text = "Application Under Review",
                             style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -107,7 +102,7 @@ fun RegistrationStatusScreen(
                         Text(
                             text = "Your request to join Acme Technologies Corp (Code: OM-10245) is currently awaiting HR approval.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondaryLight,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
 
@@ -115,15 +110,21 @@ fun RegistrationStatusScreen(
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            shape = RoundedCornerShape(18.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text(text = "Request Details", style = MaterialTheme.typography.labelMedium, color = PrimaryLight)
+                                Text(
+                                    text = "Request Details",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
                                 Spacer(modifier = Modifier.height(6.dp))
-                                Text(text = "Applicant: Alex Morgan", style = MaterialTheme.typography.bodyMedium)
-                                Text(text = "Requested Date: Today", style = MaterialTheme.typography.bodyMedium)
-                                Text(text = "Target Department: Software Engineering", style = MaterialTheme.typography.bodyMedium)
+                                Text(text = "Applicant: Alex Morgan", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Text(text = "Requested Date: Today", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Text(text = "Target Department: Software Engineering", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     }
@@ -147,13 +148,13 @@ fun RegistrationStatusScreen(
                             modifier = Modifier
                                 .size(90.dp)
                                 .clip(CircleShape)
-                                .background(SuccessColor.copy(alpha = 0.15f)),
+                                .background(SuccessLight.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.CheckCircle,
                                 contentDescription = "Approved",
-                                tint = SuccessColor,
+                                tint = SuccessLight,
                                 modifier = Modifier.size(48.dp)
                             )
                         }
@@ -163,7 +164,8 @@ fun RegistrationStatusScreen(
                         Text(
                             text = "Application Approved!",
                             style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -171,7 +173,7 @@ fun RegistrationStatusScreen(
                         Text(
                             text = "Welcome aboard! Your request to join Acme Technologies Corp has been approved by HR.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondaryLight,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -191,13 +193,13 @@ fun RegistrationStatusScreen(
                             modifier = Modifier
                                 .size(90.dp)
                                 .clip(CircleShape)
-                                .background(ErrorColor.copy(alpha = 0.15f)),
+                                .background(ErrorLight.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Cancel,
                                 contentDescription = "Rejected",
-                                tint = ErrorColor,
+                                tint = ErrorLight,
                                 modifier = Modifier.size(48.dp)
                             )
                         }
@@ -207,7 +209,8 @@ fun RegistrationStatusScreen(
                         Text(
                             text = "Application Declined",
                             style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -215,7 +218,7 @@ fun RegistrationStatusScreen(
                         Text(
                             text = "Your request to join Acme Technologies Corp could not be processed. Please verify your company code with your HR administrator.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondaryLight,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }

@@ -18,8 +18,8 @@ fun SalarySlipsScreen(
     viewModel: SalaryViewModel = hiltViewModel()
 ) {
     val salarySlips by viewModel.salarySlips.collectAsState()
-    var selectedYear by remember { mutableStateOf("2024") }
-    var snackbarMessage by remember { mutableStateOf<String?>(null) }
+    var selectedYear by remember { mutableStateOf("2025") }
+    var downloadMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -34,13 +34,13 @@ fun SalarySlipsScreen(
 
         Column(modifier = Modifier.padding(16.dp)) {
             InfoBanner(
-                message = "Demo Document Repository: Bundled sample salary slips for demonstration."
+                message = "Demo Document Repository: Bundled sample salary slips for preview."
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             FilterChipRow(
-                options = listOf("2024", "2023"),
+                options = listOf("2025", "2024"),
                 selectedOption = selectedYear,
                 onOptionSelected = { selectedYear = it }
             )
@@ -56,23 +56,20 @@ fun SalarySlipsScreen(
                         period = slip.period,
                         publishDate = slip.publishDate,
                         onViewPdf = { onNavigateToPdfViewer(slip.id) },
-                        onDownloadPdf = { snackbarMessage = "Downloading sample PDF for ${slip.monthYear}..." }
+                        onDownloadPdf = { downloadMessage = "Downloading sample PDF for ${slip.monthYear}..." }
                     )
                 }
             }
         }
     }
 
-    snackbarMessage?.let { msg ->
-        AlertDialog(
-            onDismissRequest = { snackbarMessage = null },
-            title = { Text("Download Started") },
-            text = { Text(msg) },
-            confirmButton = {
-                TextButton(onClick = { snackbarMessage = null }) {
-                    Text("OK")
-                }
-            }
+    downloadMessage?.let { msg ->
+        ConfirmationDialog(
+            title = "Download PDF",
+            message = msg,
+            confirmText = "OK",
+            onConfirm = { downloadMessage = null },
+            onDismiss = { downloadMessage = null }
         )
     }
 }

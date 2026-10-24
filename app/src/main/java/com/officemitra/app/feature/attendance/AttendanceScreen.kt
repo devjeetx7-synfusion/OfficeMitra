@@ -1,7 +1,9 @@
 package com.officemitra.app.feature.attendance
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -11,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,9 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.SuccessColor
-import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,7 +53,11 @@ fun AttendanceScreen(
             title = "Attendance Tracking",
             actions = {
                 IconButton(onClick = onNavigateToHistory) {
-                    Icon(imageVector = Icons.Outlined.History, contentDescription = "History")
+                    Icon(
+                        imageVector = Icons.Outlined.History,
+                        contentDescription = "History",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         )
@@ -65,31 +68,28 @@ fun AttendanceScreen(
                 .padding(20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Live Clock Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            // Live Clock Cyan-to-Blue Gradient Hero Card
+            GradientHeroCard(
+                gradient = AttendanceGradient
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale.getDefault()).format(Date()),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondaryLight
+                        color = Color.White.copy(alpha = 0.85f)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = currentTime,
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryLight
+                        color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    StatusBadge(status = if (uiState.isPunchedIn) "Punched In" else "Not Punched")
+                    Spacer(modifier = Modifier.height(14.dp))
+                    StatusChip(status = if (uiState.isPunchedIn) "Punched In" else "Not Punched")
                 }
             }
 
@@ -98,7 +98,7 @@ fun AttendanceScreen(
             // Location Indicator Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
@@ -108,27 +108,41 @@ fun AttendanceScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(42.dp)
                             .clip(CircleShape)
-                            .background(SuccessColor.copy(alpha = 0.12f)),
+                            .background(PastelGreen),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(imageVector = Icons.Outlined.LocationOn, contentDescription = null, tint = SuccessColor)
+                        Icon(
+                            imageVector = Icons.Outlined.LocationOn,
+                            contentDescription = null,
+                            tint = SuccessLight,
+                            modifier = Modifier.size(22.dp)
+                        )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text(text = "Location Verification", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(text = uiState.locationStatus, style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                        Text(
+                            text = "Location Verification",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = uiState.locationStatus,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Camera Selfie UI Card
+            // Camera Selfie Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
@@ -141,25 +155,46 @@ fun AttendanceScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Verification Selfie", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Verification Selfie",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                         IconButton(onClick = { showCameraPreviewDialog = true }) {
-                            Icon(imageVector = Icons.Outlined.CameraAlt, contentDescription = "Camera", tint = PrimaryLight)
+                            Icon(
+                                imageVector = Icons.Outlined.CameraAlt,
+                                contentDescription = "Camera",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(140.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .height(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .border(1.dp, PrimaryLight.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(14.dp))
+                            .clickable { showCameraPreviewDialog = true },
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(imageVector = Icons.Outlined.CameraAlt, contentDescription = null, tint = TextSecondaryLight, modifier = Modifier.size(36.dp))
+                            Icon(
+                                imageVector = Icons.Outlined.CameraAlt,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(32.dp)
+                            )
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text(text = "Tap camera to capture selfie verification photo", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                            Text(
+                                text = "Tap to capture selfie verification photo",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
@@ -168,30 +203,30 @@ fun AttendanceScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Primary Punch Button
-            PrimaryButton(
+            GradientPrimaryButton(
                 text = if (uiState.isPunchedIn) "Punch Out Now" else "Punch In Now",
-                onClick = viewModel::punchInOrOut
+                onClick = viewModel::punchInOrOut,
+                gradient = AttendanceGradient
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlineButton(
                 text = "Request Attendance Correction",
                 onClick = onNavigateToCorrection
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 
     if (showCameraPreviewDialog) {
-        AlertDialog(
-            onDismissRequest = { showCameraPreviewDialog = false },
-            title = { Text("Selfie Preview (UI Camera Demo)") },
-            text = { Text("Selfie captured and verified locally for punch action.") },
-            confirmButton = {
-                TextButton(onClick = { showCameraPreviewDialog = false }) {
-                    Text("OK")
-                }
-            }
+        ConfirmationDialog(
+            title = "Selfie Verification (Camera)",
+            message = "Selfie photo captured and verified locally for punch action.",
+            confirmText = "OK",
+            onConfirm = { showCameraPreviewDialog = false },
+            onDismiss = { showCameraPreviewDialog = false }
         )
     }
 }
