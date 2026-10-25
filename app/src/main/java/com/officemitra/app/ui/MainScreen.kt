@@ -1,19 +1,22 @@
 package com.officemitra.app.ui
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.officemitra.app.core.components.BottomNavItem
-import com.officemitra.app.core.components.OfficeMitraBottomBar
+import com.officemitra.app.core.components.SplitFloatingDock
 import com.officemitra.app.core.navigation.AppNavGraph
 import com.officemitra.app.core.navigation.Screen
 
@@ -54,27 +57,64 @@ fun MainScreen(
     val showBottomBar = currentRoute in bottomNavItems.map { it.route }
 
     Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                OfficeMitraBottomBar(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            val bottomPadding = if (showBottomBar) 90.dp else 0.dp
+
+            AppNavGraph(
+                navController = navController,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = bottomPadding)
+            )
+
+            AnimatedVisibility(
+                visible = showBottomBar,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(durationMillis = 300)
+                ) + fadeIn(animationSpec = tween(durationMillis = 300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(durationMillis = 250)
+                ) + fadeOut(animationSpec = tween(durationMillis = 250)),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = 16.dp)
+            ) {
+                SplitFloatingDock(
                     items = bottomNavItems,
                     currentRoute = currentRoute,
                     onItemClick = { item ->
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
+                        }
+                    },
+                    onQuickPunchClick = {
+                        if (currentRoute != Screen.Attendance.route) {
+                            navController.navigate(Screen.Attendance.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     }
                 )
             }
         }
-    ) { paddingValues ->
-        AppNavGraph(
-            navController = navController,
-            modifier = Modifier.padding(paddingValues)
-        )
     }
 }
