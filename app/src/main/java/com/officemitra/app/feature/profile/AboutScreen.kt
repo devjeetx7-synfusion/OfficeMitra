@@ -15,8 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.OfficeMitraTopBar
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.theme.PrimaryGradient
 
 @Composable
 fun AboutScreen(
@@ -45,7 +44,7 @@ fun AboutScreen(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(PrimaryLight),
+                        .background(PrimaryGradient),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -61,29 +60,30 @@ fun AboutScreen(
                 Text(
                     text = "Office Mitra",
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Text(
-                    text = "Version 1.0.0 (Build 2024.05)",
+                    text = "Version 3.0.0 (Gradient SaaS UI)",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "Office Mitra is a premium workforce management application designed to streamline employee attendance, leave tracking, approvals, payroll documents, and company communications.",
+                    text = "Office Mitra is a premium Gradient SaaS workforce management platform designed to streamline employee attendance, leave tracking, approvals, payroll documents, and company communications.",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    color = TextSecondaryLight
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Text(
-                text = "© 2024 Office Mitra SaaS Platform. All rights reserved.",
+                text = "© 2025 Office Mitra SaaS Platform. All rights reserved.",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondaryLight
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

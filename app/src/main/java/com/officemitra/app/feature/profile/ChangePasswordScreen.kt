@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.ErrorColor
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun ChangePasswordScreen(
@@ -39,8 +37,17 @@ fun ChangePasswordScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = "Security Settings", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text(text = "Enter your current password and set a new password.", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                Text(
+                    text = "Security Settings",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Enter your current password and set a new password.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -52,7 +59,7 @@ fun ChangePasswordScreen(
 
                 if (errorMsg != null) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = errorMsg!!, color = ErrorColor, style = MaterialTheme.typography.bodySmall)
+                    Text(text = errorMsg!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
 
                 if (isSuccess) {

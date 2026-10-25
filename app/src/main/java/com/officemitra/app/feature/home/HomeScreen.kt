@@ -1,14 +1,15 @@
 package com.officemitra.app.feature.home
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.automirrored.outlined.EventNote
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,10 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToAttendance: () -> Unit,
@@ -44,7 +43,7 @@ fun HomeScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Top Header
+        // Top Header Surface
         Surface(
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 2.dp
@@ -52,7 +51,7 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -65,7 +64,7 @@ fun HomeScreen(
                     EmployeeAvatar(
                         imageUrl = uiState.user.avatarUrl,
                         name = uiState.user.name,
-                        size = 48
+                        size = 46
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
@@ -73,13 +72,14 @@ fun HomeScreen(
                             text = "Good day, ${uiState.user.name}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = uiState.user.companyName,
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondaryLight
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -116,8 +116,8 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Attendance Summary Card
-            AttendanceCard(
+            // Attendance Hero Card
+            AttendanceStatusCard(
                 date = uiState.todayAttendance.date,
                 status = uiState.todayAttendance.status,
                 punchIn = uiState.todayAttendance.punchIn,
@@ -127,7 +127,7 @@ fun HomeScreen(
                 isPunchedIn = uiState.isPunchedIn
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
             // Quick Actions Section
             SectionHeader(title = "Quick Actions")
@@ -136,22 +136,31 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                QuickActionCard(
+                QuickActionTile(
                     title = "Attendance",
                     icon = Icons.Outlined.AccessTime,
                     onClick = onNavigateToAttendance,
+                    iconBgColor = PastelCyan,
+                    iconDarkBgColor = PastelCyanDark,
+                    iconTint = CyanLight,
                     modifier = Modifier.weight(1f)
                 )
-                QuickActionCard(
+                QuickActionTile(
                     title = "Apply Leave",
-                    icon = Icons.Outlined.EventNote,
+                    icon = Icons.AutoMirrored.Outlined.EventNote,
                     onClick = onNavigateToApplyLeave,
+                    iconBgColor = PastelPink,
+                    iconDarkBgColor = PastelPinkDark,
+                    iconTint = PinkLight,
                     modifier = Modifier.weight(1f)
                 )
-                QuickActionCard(
+                QuickActionTile(
                     title = "Salary Slips",
-                    icon = Icons.Outlined.ReceiptLong,
+                    icon = Icons.AutoMirrored.Outlined.ReceiptLong,
                     onClick = onNavigateToSalarySlips,
+                    iconBgColor = PastelViolet,
+                    iconDarkBgColor = PastelVioletDark,
+                    iconTint = PrimaryLight,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -162,54 +171,65 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                QuickActionCard(
+                QuickActionTile(
                     title = "Holidays",
                     icon = Icons.Outlined.BeachAccess,
                     onClick = onNavigateToHolidays,
+                    iconBgColor = PastelAmber,
+                    iconDarkBgColor = PastelAmberDark,
+                    iconTint = WarningLight,
                     modifier = Modifier.weight(1f)
                 )
-                QuickActionCard(
+                QuickActionTile(
                     title = "Approvals",
                     icon = Icons.Outlined.HowToReg,
                     onClick = onNavigateToApprovals,
+                    iconBgColor = PastelGreen,
+                    iconDarkBgColor = PastelGreenDark,
+                    iconTint = SuccessLight,
                     modifier = Modifier.weight(1f)
                 )
-                QuickActionCard(
+                QuickActionTile(
                     title = "History",
                     icon = Icons.Outlined.History,
                     onClick = onNavigateToAttendanceHistory,
+                    iconBgColor = PastelBlue,
+                    iconDarkBgColor = PastelBlueDark,
+                    iconTint = SecondaryLight,
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
-            // Monthly Overview
-            SectionHeader(title = "Monthly Overview (May 2024)")
+            // Monthly Overview Metrics
+            SectionHeader(title = "Monthly Overview")
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                SummaryCard(
-                    title = "Present",
+                SummaryMetricCard(
+                    title = "Present Days",
                     value = "18 Days",
-                    subtitle = "+2 Days vs Apr",
+                    subtitle = "On Track",
                     icon = Icons.Outlined.CheckCircle,
+                    accentColor = SuccessLight,
                     modifier = Modifier.weight(1f)
                 )
-                SummaryCard(
-                    title = "Leaves",
+                SummaryMetricCard(
+                    title = "Leave Days",
                     value = "2 Days",
                     subtitle = "1 Pending",
                     icon = Icons.Outlined.Event,
+                    accentColor = PinkLight,
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
-            // Recent Activity
+            // Recent Activity Section
             SectionHeader(
                 title = "Recent Activity",
                 actionText = "View All",

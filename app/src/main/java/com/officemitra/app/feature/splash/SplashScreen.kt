@@ -16,9 +16,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.officemitra.app.core.theme.PrimaryLight
+import com.officemitra.app.core.theme.PrimaryGradient
 
 @Composable
 fun SplashScreen(
@@ -71,7 +70,7 @@ fun SplashScreen(
                     .size(100.dp)
                     .scale(scale.value)
                     .clip(CircleShape)
-                    .background(PrimaryLight),
+                    .background(PrimaryGradient),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -94,7 +93,7 @@ fun SplashScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Smart Workforce Management",
+                text = "Smart Workforce Management SaaS",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -102,7 +101,7 @@ fun SplashScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             CircularProgressIndicator(
-                color = PrimaryLight,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(32.dp),
                 strokeWidth = 3.dp
             )

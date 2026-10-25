@@ -50,7 +50,7 @@ fun HolidaysScreen(
             if (filteredHolidays.isEmpty()) {
                 EmptyState(
                     title = "No Holidays Found",
-                    description = "There are no $selectedFilter holidays recorded."
+                    description = "There are no $selectedFilter holidays recorded for this company."
                 )
             } else {
                 LazyColumn(

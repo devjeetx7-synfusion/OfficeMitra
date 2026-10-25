@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,8 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
 import com.officemitra.app.data.model.AttendanceRecord
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
 
 @Composable
 fun AttendanceHistoryScreen(
@@ -50,23 +45,34 @@ fun AttendanceHistoryScreen(
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
-            // Month Header
+            // Month Header Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(14.dp),
+                    modifier = Modifier.padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "May 2024", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text(text = "Total Worked: 42h 18m", style = MaterialTheme.typography.bodySmall, color = PrimaryLight)
+                    Text(
+                        text = "Current Month History",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Total Worked: 42h 18m",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Filter Chips
             FilterChipRow(
@@ -75,7 +81,7 @@ fun AttendanceHistoryScreen(
                 onOptionSelected = { selectedFilter = it }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (filteredRecords.isEmpty()) {
                 EmptyState(
@@ -84,34 +90,48 @@ fun AttendanceHistoryScreen(
                 )
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredRecords) { record ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { selectedRecordForDetail = record },
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Row(
                                 modifier = Modifier
-                                    .padding(14.dp)
+                                    .padding(16.dp)
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text(text = record.date, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = record.date,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
                                     Spacer(modifier = Modifier.height(2.dp))
-                                    Text(text = "In: ${record.punchIn} | Out: ${record.punchOut}", style = MaterialTheme.typography.bodySmall, color = TextSecondaryLight)
+                                    Text(
+                                        text = "In: ${record.punchIn} • Out: ${record.punchOut}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
 
                                 Column(horizontalAlignment = Alignment.End) {
-                                    StatusBadge(status = record.status)
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(text = record.workingDuration, style = MaterialTheme.typography.bodySmall, color = PrimaryLight)
+                                    StatusChip(status = record.status)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = record.workingDuration,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
                                 }
                             }
                         }
@@ -124,14 +144,21 @@ fun AttendanceHistoryScreen(
     selectedRecordForDetail?.let { record ->
         AlertDialog(
             onDismissRequest = { selectedRecordForDetail = null },
-            title = { Text(text = "Attendance Details - ${record.date}") },
+            title = {
+                Text(
+                    text = "Attendance Detail",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
             text = {
-                Column {
-                    Text("Status: ${record.status}")
-                    Text("Punch In: ${record.punchIn}")
-                    Text("Punch Out: ${record.punchOut}")
-                    Text("Working Duration: ${record.workingDuration}")
-                    Text("Location: ${record.location}")
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(text = "Date: ${record.date}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Status: ${record.status}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Punch In: ${record.punchIn}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Punch Out: ${record.punchOut}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Working Duration: ${record.workingDuration}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Location: ${record.location}", style = MaterialTheme.typography.bodyMedium)
                 }
             },
             confirmButton = {
@@ -139,14 +166,16 @@ fun AttendanceHistoryScreen(
                     selectedRecordForDetail = null
                     onNavigateToCorrection()
                 }) {
-                    Text("Request Correction")
+                    Text("Request Correction", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { selectedRecordForDetail = null }) {
                     Text("Close")
                 }
-            }
+            },
+            shape = RoundedCornerShape(18.dp),
+            containerColor = MaterialTheme.colorScheme.surface
         )
     }
 }

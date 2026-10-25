@@ -17,16 +17,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.officemitra.app.core.components.OutlineButton
-import com.officemitra.app.core.components.PrimaryButton
-import com.officemitra.app.core.theme.PrimaryLight
-import com.officemitra.app.core.theme.TextSecondaryLight
+import com.officemitra.app.core.components.GradientPrimaryButton
 import kotlinx.coroutines.launch
 
 data class OnboardingPageData(
@@ -43,18 +39,18 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPageData(
-            title = "Smart Attendance",
-            description = "Track your daily attendance effortlessly with live location and photo verification.",
+            title = "Smart Attendance Tracking",
+            description = "Track your daily attendance effortlessly with live location verification and selfie photos.",
             icon = Icons.Filled.AccessTime
         ),
         OnboardingPageData(
-            title = "Manage Your Leaves",
-            description = "Apply for casual, sick, or earned leaves and track approval status in real-time.",
+            title = "Seamless Leave Management",
+            description = "Apply for casual, sick, or earned leaves and check your live approval status anytime.",
             icon = Icons.Filled.CalendarMonth
         ),
         OnboardingPageData(
-            title = "Everything in One Place",
-            description = "Access company holidays, download salary slips, and manage approvals seamlessly.",
+            title = "Workforce Hub in One App",
+            description = "Access company holiday calendars, salary slip PDF downloads, and team approvals instantly.",
             icon = Icons.Filled.Dashboard
         )
     )
@@ -80,7 +76,7 @@ fun OnboardingScreen(
                     Text(
                         text = "Skip",
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextSecondaryLight
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
@@ -105,13 +101,13 @@ fun OnboardingScreen(
                     modifier = Modifier
                         .size(160.dp)
                         .clip(CircleShape)
-                        .background(PrimaryLight.copy(alpha = 0.1f)),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = page.icon,
                         contentDescription = page.title,
-                        tint = PrimaryLight,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(80.dp)
                     )
                 }
@@ -122,6 +118,7 @@ fun OnboardingScreen(
                     text = page.title,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
 
@@ -130,13 +127,13 @@ fun OnboardingScreen(
                 Text(
                     text = page.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TextSecondaryLight,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
         }
 
-        // Indicators & Next/Get Started
+        // Indicators & Buttons
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -155,13 +152,15 @@ fun OnboardingScreen(
                             .height(8.dp)
                             .width(if (isSelected) 24.dp else 8.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(if (isSelected) PrimaryLight else TextSecondaryLight.copy(alpha = 0.3f))
+                            .background(
+                                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                            )
                     )
                 }
             }
 
             if (pagerState.currentPage < pages.size - 1) {
-                PrimaryButton(
+                GradientPrimaryButton(
                     text = "Next",
                     onClick = {
                         coroutineScope.launch {
@@ -170,7 +169,7 @@ fun OnboardingScreen(
                     }
                 )
             } else {
-                PrimaryButton(
+                GradientPrimaryButton(
                     text = "Get Started",
                     onClick = {
                         viewModel.completeOnboarding(onFinishOnboarding)

@@ -8,7 +8,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
@@ -40,7 +42,11 @@ fun NotificationsScreen(
             onBackClick = onBackClick,
             actions = {
                 IconButton(onClick = viewModel::markAllAsRead) {
-                    Icon(imageVector = Icons.Outlined.DoneAll, contentDescription = "Mark all as read")
+                    Icon(
+                        imageVector = Icons.Outlined.DoneAll,
+                        contentDescription = "Mark all as read",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         )
@@ -57,20 +63,28 @@ fun NotificationsScreen(
             if (filteredList.isEmpty()) {
                 EmptyState(
                     title = "No Notifications",
-                    description = "You have no notifications in this category."
+                    description = "You have no notifications under the '$selectedCategory' category."
                 )
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(onClick = { showClearConfirmDialog = true }) {
-                        Text("Clear All")
+                        Text(
+                            text = "Clear All",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
 
+                Spacer(modifier = Modifier.height(4.dp))
+
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredList) { notification ->
                         NotificationCard(
@@ -92,8 +106,8 @@ fun NotificationsScreen(
 
     if (showClearConfirmDialog) {
         ConfirmationDialog(
-            title = "Clear Notifications",
-            message = "Are you sure you want to clear all demo notifications?",
+            title = "Clear All Notifications",
+            message = "Are you sure you want to clear all notifications?",
             confirmText = "Clear All",
             onConfirm = {
                 viewModel.clearAll()
