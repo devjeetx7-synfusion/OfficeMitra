@@ -34,6 +34,7 @@ fun AttendanceStatusCard(
 ) {
     GradientHeroCard(
         gradient = PrimaryGradient,
+        cornerRadius = 18.dp,
         modifier = modifier
     ) {
         Row(
@@ -46,7 +47,7 @@ fun AttendanceStatusCard(
                     imageVector = Icons.Outlined.AccessTime,
                     contentDescription = null,
                     tint = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
@@ -59,38 +60,38 @@ fun AttendanceStatusCard(
             StatusChip(status = status)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(Color.White.copy(alpha = 0.12f))
-                .padding(14.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = "Punch In", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
-                Text(text = punchIn, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(text = "Punch In", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.75f))
+                Text(text = punchIn, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
             }
             Column {
-                Text(text = "Punch Out", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
-                Text(text = punchOut, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(text = "Punch Out", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.75f))
+                Text(text = punchOut, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
             }
             Column {
-                Text(text = "Working Duration", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
-                Text(text = workingDuration, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(text = "Working Duration", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.75f))
+                Text(text = workingDuration, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
             onClick = onPunchClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            shape = RoundedCornerShape(12.dp),
+                .height(42.dp),
+            shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White,
                 contentColor = PrimaryLight
@@ -99,12 +100,12 @@ fun AttendanceStatusCard(
             Icon(
                 imageVector = if (isPunchedIn) Icons.AutoMirrored.Outlined.Logout else Icons.Outlined.Login,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = if (isPunchedIn) "Punch Out Now" else "Punch In Now",
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
         }

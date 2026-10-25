@@ -2,6 +2,7 @@ package com.officemitra.app.core.components
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -167,15 +168,130 @@ fun SaaSBottomNavigation(
 }
 
 @Composable
+fun SplitFloatingDock(
+    items: List<BottomNavItem>,
+    currentRoute: String?,
+    onItemClick: (BottomNavItem) -> Unit,
+    onQuickPunchClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Floating Capsule
+        Surface(
+            modifier = Modifier.weight(1f),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp,
+            shadowElevation = 8.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items.forEach { item ->
+                    val isSelected = currentRoute == item.route
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val isPressed by interactionSource.collectIsPressedAsState()
+
+                    val scale by animateFloatAsState(
+                        targetValue = if (isPressed) 0.90f else 1.0f,
+                        animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
+                        label = "icon_scale"
+                    )
+
+                    val activeBgColor = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+                    } else {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                            .scale(scale)
+                            .clip(CircleShape)
+                            .background(if (isSelected) activeBgColor else Color.Transparent)
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = { onItemClick(item) }
+                            )
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = item.title,
+                            tint = if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            },
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Quick Punch Circular Button
+        val quickPunchInteraction = remember { MutableInteractionSource() }
+        val isQuickPunchPressed by quickPunchInteraction.collectIsPressedAsState()
+        val quickPunchScale by animateFloatAsState(
+            targetValue = if (isQuickPunchPressed) 0.92f else 1.0f,
+            animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
+            label = "quick_punch_scale"
+        )
+
+        Surface(
+            onClick = onQuickPunchClick,
+            modifier = Modifier
+                .size(60.dp)
+                .scale(quickPunchScale),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primary,
+            tonalElevation = 6.dp,
+            shadowElevation = 8.dp,
+            interactionSource = quickPunchInteraction
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.CameraAlt,
+                    contentDescription = "Quick Punch",
+                    tint = Color.White,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun OfficeMitraBottomBar(
     items: List<BottomNavItem>,
     currentRoute: String?,
-    onItemClick: (BottomNavItem) -> Unit
+    onItemClick: (BottomNavItem) -> Unit,
+    onQuickPunchClick: () -> Unit = {}
 ) {
-    SaaSBottomNavigation(
+    SplitFloatingDock(
         items = items,
         currentRoute = currentRoute,
-        onItemClick = onItemClick
+        onItemClick = onItemClick,
+        onQuickPunchClick = onQuickPunchClick
     )
 }
 
@@ -582,13 +698,13 @@ fun QuickActionTile(
     Card(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Box(
             modifier = Modifier
-                .padding(12.dp)
+                .padding(vertical = 10.dp, horizontal = 8.dp)
                 .fillMaxWidth()
         ) {
             Column(
@@ -598,7 +714,7 @@ fun QuickActionTile(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(42.dp)
                         .clip(CircleShape)
                         .background(effectiveIconBg),
                     contentAlignment = Alignment.Center
@@ -607,13 +723,13 @@ fun QuickActionTile(
                         imageVector = icon,
                         contentDescription = title,
                         tint = if (isDark) MaterialTheme.colorScheme.primary else iconTint,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
@@ -749,20 +865,20 @@ fun StatusChip(
 
     val (bgColor, textColor) = when (status.lowercase()) {
         "present", "approved", "completed", "success", "punched in" -> {
-            if (isDark) Color(0xFF064E3B).copy(alpha = 0.6f) to SuccessDark
-            else SuccessLight.copy(alpha = 0.15f) to SuccessLight
+            if (isDark) Color(0xFF065F46) to Color(0xFFA7F3D0)
+            else SuccessLight.copy(alpha = 0.18f) to Color(0xFF047857)
         }
         "absent", "rejected", "failed", "cancelled" -> {
-            if (isDark) Color(0xFF7F1D1D).copy(alpha = 0.6f) to ErrorDark
-            else ErrorLight.copy(alpha = 0.15f) to ErrorLight
+            if (isDark) Color(0xFF991B1B) to Color(0xFFFECACA)
+            else ErrorLight.copy(alpha = 0.18f) to Color(0xFFB91C1C)
         }
         "pending", "half day", "warning", "not punched" -> {
-            if (isDark) Color(0xFF78350F).copy(alpha = 0.6f) to WarningDark
-            else WarningLight.copy(alpha = 0.15f) to WarningLight
+            if (isDark) Color(0xFF92400E) to Color(0xFFFDE68A)
+            else Color(0xFFFEF3C7) to Color(0xFFB45309)
         }
         "leave", "on leave" -> {
-            if (isDark) Color(0xFF4C1D95).copy(alpha = 0.6f) to PrimaryDark
-            else PrimaryLight.copy(alpha = 0.15f) to PrimaryLight
+            if (isDark) Color(0xFF5B21B6) to Color(0xFFDDD6FE)
+            else PrimaryLight.copy(alpha = 0.18f) to Color(0xFF4338CA)
         }
         else -> {
             if (isDark) BorderDark to TextSecondaryDark
