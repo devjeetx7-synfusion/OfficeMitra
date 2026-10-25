@@ -1,5 +1,6 @@
 package com.officemitra.app.feature.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -46,7 +47,7 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Violet-Blue Gradient Profile Header Card
+            // Midnight Ink Profile Header Card
             ProfileHeader(
                 name = uiState.user.name,
                 employeeId = uiState.user.employeeId,
@@ -57,7 +58,7 @@ fun ProfileScreen(
                 onEditClick = onNavigateToEditProfile
             )
 
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Personal Information
             SectionHeader(
@@ -66,11 +67,11 @@ fun ProfileScreen(
                 onActionClick = onNavigateToEditProfile
             )
 
-            Card(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     InfoRow(label = "Email Address", value = uiState.user.email, icon = Icons.Outlined.Email)
@@ -83,33 +84,36 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Settings & Preferences
             SectionHeader(title = "Account Settings")
 
-            Card(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
-                Column(modifier = Modifier.padding(vertical = 6.dp)) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     SettingOptionRow(
                         title = "Edit Profile Info",
                         icon = Icons.Outlined.Person,
                         onClick = onNavigateToEditProfile
                     )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     SettingOptionRow(
                         title = "Change Password",
                         icon = Icons.Outlined.Lock,
                         onClick = onNavigateToChangePassword
                     )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     SettingOptionRow(
                         title = "App Preferences & Theme",
                         icon = Icons.Outlined.Settings,
                         onClick = onNavigateToAppSettings
                     )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     SettingOptionRow(
                         title = "About Office Mitra",
                         icon = Icons.Outlined.Info,
@@ -125,8 +129,8 @@ fun ProfileScreen(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
                     contentColor = MaterialTheme.colorScheme.error

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.officemitra.app.core.components.BottomNavItem
-import com.officemitra.app.core.components.SplitFloatingDock
+import com.officemitra.app.core.components.FloatingNavigationDock
 import com.officemitra.app.core.navigation.AppNavGraph
 import com.officemitra.app.core.navigation.Screen
 
@@ -57,6 +58,7 @@ fun MainScreen(
     val showBottomBar = currentRoute in bottomNavItems.map { it.route }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -64,7 +66,7 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            val bottomPadding = if (showBottomBar) 90.dp else 0.dp
+            val bottomPadding = if (showBottomBar) 84.dp else 0.dp
 
             AppNavGraph(
                 navController = navController,
@@ -77,34 +79,23 @@ fun MainScreen(
                 visible = showBottomBar,
                 enter = slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = tween(durationMillis = 300)
-                ) + fadeIn(animationSpec = tween(durationMillis = 300)),
+                    animationSpec = tween(durationMillis = 280)
+                ) + fadeIn(animationSpec = tween(durationMillis = 280)),
                 exit = slideOutVertically(
                     targetOffsetY = { it },
-                    animationSpec = tween(durationMillis = 250)
-                ) + fadeOut(animationSpec = tween(durationMillis = 250)),
+                    animationSpec = tween(durationMillis = 220)
+                ) + fadeOut(animationSpec = tween(durationMillis = 220)),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 12.dp)
             ) {
-                SplitFloatingDock(
+                FloatingNavigationDock(
                     items = bottomNavItems,
                     currentRoute = currentRoute,
                     onItemClick = { item ->
                         if (currentRoute != item.route) {
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    },
-                    onQuickPunchClick = {
-                        if (currentRoute != Screen.Attendance.route) {
-                            navController.navigate(Screen.Attendance.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }

@@ -1,5 +1,6 @@
 package com.officemitra.app.feature.attendance
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,12 +46,12 @@ fun AttendanceHistoryScreen(
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
-            // Month Header Card
-            Card(
+            // Month Summary Card
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -93,13 +94,13 @@ fun AttendanceHistoryScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredRecords) { record ->
-                        Card(
+                        Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { selectedRecordForDetail = record },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
                         ) {
                             Row(
                                 modifier = Modifier

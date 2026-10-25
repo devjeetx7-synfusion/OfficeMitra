@@ -1,5 +1,6 @@
 package com.officemitra.app.feature.leave
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,11 +41,11 @@ fun LeaveDetailsScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             request?.let { req ->
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Row(

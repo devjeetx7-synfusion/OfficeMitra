@@ -1,6 +1,7 @@
 package com.officemitra.app.feature.attendance
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -68,18 +69,22 @@ fun AttendanceScreen(
                 .padding(20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Live Clock Cyan-to-Blue Gradient Hero Card
-            GradientHeroCard(
-                gradient = AttendanceGradient
+            // Live Clock Solid Midnight Ink Hero Card
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(22.dp),
+                color = BrandInk
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale.getDefault()).format(Date()),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.85f)
+                        color = TealLight
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -95,12 +100,12 @@ fun AttendanceScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Location Indicator Card
-            Card(
+            // Location Verification Card
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -110,7 +115,7 @@ fun AttendanceScreen(
                         modifier = Modifier
                             .size(42.dp)
                             .clip(CircleShape)
-                            .background(PastelGreen),
+                            .background(SoftSuccessContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -137,14 +142,14 @@ fun AttendanceScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Camera Selfie Card
-            Card(
+            // Camera Selfie Verification Card
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -175,10 +180,10 @@ fun AttendanceScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(130.dp)
-                            .clip(RoundedCornerShape(14.dp))
+                            .height(120.dp)
+                            .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(14.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                             .clickable { showCameraPreviewDialog = true },
                         contentAlignment = Alignment.Center
                     ) {
@@ -202,11 +207,10 @@ fun AttendanceScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Primary Punch Button
-            GradientPrimaryButton(
+            // Primary Punch Action Button
+            PrimaryButton(
                 text = if (uiState.isPunchedIn) "Punch Out Now" else "Punch In Now",
-                onClick = viewModel::punchInOrOut,
-                gradient = AttendanceGradient
+                onClick = viewModel::punchInOrOut
             )
 
             Spacer(modifier = Modifier.height(12.dp))

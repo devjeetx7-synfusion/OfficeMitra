@@ -12,41 +12,51 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = PrimaryLight,
+    primary = BrandTeal,
     onPrimary = SurfaceLight,
-    primaryContainer = PrimaryLight.copy(alpha = 0.12f),
-    onPrimaryContainer = PrimaryLight,
-    secondary = SecondaryLight,
+    primaryContainer = TealLight,
+    onPrimaryContainer = TealDark,
+    secondary = TealDark,
     onSecondary = SurfaceLight,
-    secondaryContainer = SecondaryLight.copy(alpha = 0.12f),
-    onSecondaryContainer = SecondaryLight,
-    background = BackgroundLight,
+    secondaryContainer = SurfaceMuted,
+    onSecondaryContainer = TextPrimaryLight,
+    tertiary = WarmCoral,
+    onTertiary = SurfaceLight,
+    tertiaryContainer = WarmSand,
+    onTertiaryContainer = BrandInk,
+    background = AppCanvas,
     onBackground = TextPrimaryLight,
     surface = SurfaceLight,
     onSurface = TextPrimaryLight,
-    surfaceVariant = BackgroundLight,
+    surfaceVariant = SurfaceMuted,
     onSurfaceVariant = TextSecondaryLight,
     outline = BorderLight,
+    outlineVariant = BorderLight,
     error = ErrorLight,
     onError = SurfaceLight
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryDark,
+    primary = PrimaryTealDark,
     onPrimary = BackgroundDark,
-    primaryContainer = PrimaryDark.copy(alpha = 0.2f),
-    onPrimaryContainer = PrimaryDark,
-    secondary = SecondaryDark,
+    primaryContainer = SoftTealContainerDark,
+    onPrimaryContainer = PrimaryTealDark,
+    secondary = PrimaryTealDark,
     onSecondary = BackgroundDark,
-    secondaryContainer = SecondaryDark.copy(alpha = 0.2f),
-    onSecondaryContainer = SecondaryDark,
+    secondaryContainer = ElevatedSurfaceDark,
+    onSecondaryContainer = PrimaryTextDark,
+    tertiary = WarmCoral,
+    onTertiary = BackgroundDark,
+    tertiaryContainer = SoftCoralContainerDark,
+    onTertiaryContainer = PrimaryTextDark,
     background = BackgroundDark,
-    onBackground = TextPrimaryDark,
+    onBackground = PrimaryTextDark,
     surface = SurfaceDark,
-    onSurface = TextPrimaryDark,
+    onSurface = PrimaryTextDark,
     surfaceVariant = ElevatedSurfaceDark,
-    onSurfaceVariant = TextSecondaryDark,
+    onSurfaceVariant = SecondaryTextDark,
     outline = BorderDark,
+    outlineVariant = BorderDark,
     error = ErrorDark,
     onError = BackgroundDark
 )
@@ -63,7 +73,7 @@ fun OfficeMitraTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
-            window.navigationBarColor = colorScheme.surface.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = !darkTheme
