@@ -107,7 +107,7 @@ fun LeaveScreen(
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 100.dp)
                     ) {
                         items(filteredRequests) { request ->
                             Box(modifier = Modifier.clickable { onNavigateToDetails(request.id) }) {
