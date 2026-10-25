@@ -6,11 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.EventNote
-import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -52,10 +47,10 @@ fun AttendanceStatusCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Outlined.AccessTime,
+                        imageVector = AppIcons.Attendance,
                         contentDescription = null,
                         tint = TealLight,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -98,7 +93,7 @@ fun AttendanceStatusCard(
                 onClick = onPunchClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(46.dp),
+                    .height(48.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = BrandTeal,
@@ -106,7 +101,7 @@ fun AttendanceStatusCard(
                 )
             ) {
                 Icon(
-                    imageVector = if (isPunchedIn) Icons.AutoMirrored.Outlined.Logout else Icons.Outlined.Login,
+                    imageVector = if (isPunchedIn) AppIcons.PunchOut else AppIcons.PunchIn,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
@@ -273,7 +268,7 @@ fun LeaveRequestCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.EventAvailable,
+                            imageVector = AppIcons.EventAvailable,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
@@ -301,10 +296,10 @@ fun LeaveRequestCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Outlined.CalendarToday,
+                    imageVector = AppIcons.Calendar,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
@@ -331,7 +326,7 @@ fun LeaveRequestCard(
                     onClick = onCancelClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(38.dp),
+                        .height(40.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
@@ -359,10 +354,10 @@ fun NotificationCard(
     modifier: Modifier = Modifier
 ) {
     val categoryIcon = when (category.lowercase()) {
-        "leave" -> Icons.AutoMirrored.Outlined.EventNote
-        "salary slip", "salary" -> Icons.AutoMirrored.Outlined.ReceiptLong
-        "attendance" -> Icons.Outlined.AccessTime
-        else -> Icons.Outlined.Notifications
+        "leave" -> AppIcons.Leave
+        "salary slip", "salary" -> AppIcons.Salary
+        "attendance" -> AppIcons.Attendance
+        else -> AppIcons.Notifications
     }
 
     Surface(
@@ -473,7 +468,7 @@ fun SalarySlipCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.PictureAsPdf,
+                    imageVector = AppIcons.Pdf,
                     contentDescription = "PDF",
                     tint = WarmCoral,
                     modifier = Modifier.size(24.dp)
@@ -503,18 +498,26 @@ fun SalarySlipCard(
             }
 
             Row {
-                IconButton(onClick = onViewPdf) {
+                IconButton(
+                    onClick = onViewPdf,
+                    modifier = Modifier.size(48.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Outlined.Visibility,
+                        imageVector = AppIcons.View,
                         contentDescription = "View",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-                IconButton(onClick = onDownloadPdf) {
+                IconButton(
+                    onClick = onDownloadPdf,
+                    modifier = Modifier.size(48.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Outlined.Download,
+                        imageVector = AppIcons.Download,
                         contentDescription = "Download",
-                        tint = MaterialTheme.colorScheme.secondary
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -672,19 +675,19 @@ fun ApprovalCard(
                 ) {
                     OutlinedButton(
                         onClick = onRejectClick,
-                        modifier = Modifier.weight(1f).height(40.dp),
+                        modifier = Modifier.weight(1f).height(44.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Reject", fontWeight = FontWeight.Bold)
+                        Text("Reject", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
                     }
                     Button(
                         onClick = onApproveClick,
-                        modifier = Modifier.weight(1f).height(40.dp),
+                        modifier = Modifier.weight(1f).height(44.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = SuccessLight, contentColor = Color.White)
                     ) {
-                        Text("Approve", fontWeight = FontWeight.Bold)
+                        Text("Approve", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -741,13 +744,15 @@ fun ProfileHeader(
                 IconButton(
                     onClick = onEditClick,
                     modifier = Modifier
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(Color.White.copy(alpha = 0.12f))
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Edit,
+                        imageVector = AppIcons.Edit,
                         contentDescription = "Edit Profile",
-                        tint = Color.White
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }

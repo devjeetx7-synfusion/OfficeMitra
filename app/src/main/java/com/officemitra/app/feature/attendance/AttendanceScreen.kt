@@ -10,10 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -53,11 +49,15 @@ fun AttendanceScreen(
         OfficeMitraTopBar(
             title = "Attendance Tracking",
             actions = {
-                IconButton(onClick = onNavigateToHistory) {
+                IconButton(
+                    onClick = onNavigateToHistory,
+                    modifier = Modifier.size(48.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Outlined.History,
+                        imageVector = AppIcons.History,
                         contentDescription = "History",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
@@ -119,7 +119,7 @@ fun AttendanceScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.LocationOn,
+                            imageVector = AppIcons.Location,
                             contentDescription = null,
                             tint = SuccessLight,
                             modifier = Modifier.size(22.dp)
@@ -166,11 +166,15 @@ fun AttendanceScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        IconButton(onClick = { showCameraPreviewDialog = true }) {
+                        IconButton(
+                            onClick = { showCameraPreviewDialog = true },
+                            modifier = Modifier.size(48.dp)
+                        ) {
                             Icon(
-                                imageVector = Icons.Outlined.CameraAlt,
+                                imageVector = AppIcons.Camera,
                                 contentDescription = "Camera",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
@@ -189,7 +193,7 @@ fun AttendanceScreen(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
-                                imageVector = Icons.Outlined.CameraAlt,
+                                imageVector = AppIcons.Camera,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(32.dp)

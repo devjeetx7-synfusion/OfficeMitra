@@ -4,10 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -74,7 +70,7 @@ fun RegisterScreen(
                     onValueChange = viewModel::onFullNameChanged,
                     label = "Full Name",
                     placeholder = "Alex Morgan",
-                    leadingIcon = Icons.Outlined.Person,
+                    leadingIcon = AppIcons.Person,
                     isError = uiState.nameError != null,
                     errorMessage = uiState.nameError
                 )
@@ -86,7 +82,7 @@ fun RegisterScreen(
                     onValueChange = viewModel::onEmailChanged,
                     label = "Email Address",
                     placeholder = "alex.morgan@officemitra.com",
-                    leadingIcon = Icons.Outlined.Email,
+                    leadingIcon = AppIcons.Email,
                     isError = uiState.emailError != null,
                     errorMessage = uiState.emailError
                 )
@@ -98,7 +94,7 @@ fun RegisterScreen(
                     onValueChange = viewModel::onMobileNumberChanged,
                     label = "Mobile Number",
                     placeholder = "+1 555-019-2834",
-                    leadingIcon = Icons.Outlined.Phone,
+                    leadingIcon = AppIcons.Phone,
                     isError = uiState.mobileError != null,
                     errorMessage = uiState.mobileError
                 )
@@ -196,7 +192,10 @@ fun RegisterScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                TextButton(onClick = onNavigateToLogin) {
+                TextButton(
+                    onClick = onNavigateToLogin,
+                    modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                ) {
                     Text(
                         text = "Log In",
                         style = MaterialTheme.typography.bodyMedium,

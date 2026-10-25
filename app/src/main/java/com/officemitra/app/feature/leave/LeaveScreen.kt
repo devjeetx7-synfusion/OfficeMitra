@@ -5,8 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 import com.officemitra.app.core.theme.BrandTeal
 
 @Composable
@@ -42,8 +41,14 @@ fun LeaveScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNavigateToApplyLeave,
-                icon = { Icon(imageVector = Icons.Filled.Add, contentDescription = "Apply Leave") },
-                text = { Text("Apply Leave", fontWeight = FontWeight.Bold) },
+                icon = {
+                    Icon(
+                        imageVector = AppIcons.Add,
+                        contentDescription = "Apply Leave",
+                        modifier = Modifier.size(20.dp)
+                    )
+                },
+                text = { Text("Apply Leave", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold) },
                 containerColor = BrandTeal,
                 contentColor = Color.White
             )
@@ -87,6 +92,7 @@ fun LeaveScreen(
                             text = {
                                 Text(
                                     text = title,
+                                    style = MaterialTheme.typography.labelLarge,
                                     maxLines = 1,
                                     fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Medium
                                 )

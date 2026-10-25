@@ -3,11 +3,6 @@ package com.officemitra.app.ui
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +15,7 @@ import com.officemitra.app.core.components.BottomNavItem
 import com.officemitra.app.core.components.FloatingNavigationDock
 import com.officemitra.app.core.navigation.AppNavGraph
 import com.officemitra.app.core.navigation.Screen
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun MainScreen(
@@ -32,26 +28,26 @@ fun MainScreen(
         BottomNavItem(
             route = Screen.Home.route,
             title = "Home",
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home
+            selectedIcon = AppIcons.Home,
+            unselectedIcon = AppIcons.Home
         ),
         BottomNavItem(
             route = Screen.Attendance.route,
             title = "Attendance",
-            selectedIcon = Icons.Filled.AccessTime,
-            unselectedIcon = Icons.Outlined.AccessTime
+            selectedIcon = AppIcons.Attendance,
+            unselectedIcon = AppIcons.Attendance
         ),
         BottomNavItem(
             route = Screen.Leave.route,
             title = "Leave",
-            selectedIcon = Icons.Filled.Event,
-            unselectedIcon = Icons.Outlined.Event
+            selectedIcon = AppIcons.Leave,
+            unselectedIcon = AppIcons.Leave
         ),
         BottomNavItem(
             route = Screen.Profile.route,
             title = "Profile",
-            selectedIcon = Icons.Filled.Person,
-            unselectedIcon = Icons.Outlined.Person
+            selectedIcon = AppIcons.Profile,
+            unselectedIcon = AppIcons.Profile
         )
     )
 

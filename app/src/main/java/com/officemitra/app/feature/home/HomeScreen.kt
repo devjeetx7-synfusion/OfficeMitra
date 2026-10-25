@@ -5,17 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.EventNote
-import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -81,11 +75,15 @@ fun HomeScreen(
             }
 
             Box {
-                IconButton(onClick = onNavigateToNotifications) {
+                IconButton(
+                    onClick = onNavigateToNotifications,
+                    modifier = Modifier.size(48.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Outlined.Notifications,
+                        imageVector = AppIcons.Notifications,
                         contentDescription = "Notifications",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 if (uiState.unreadNotificationCount > 0) {
@@ -96,7 +94,7 @@ fun HomeScreen(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = Color.White
                     ) {
-                        Text(text = uiState.unreadNotificationCount.toString())
+                        Text(text = uiState.unreadNotificationCount.toString(), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -131,7 +129,7 @@ fun HomeScreen(
             ) {
                 QuickActionTile(
                     title = "Attendance",
-                    icon = Icons.Outlined.AccessTime,
+                    icon = AppIcons.Attendance,
                     onClick = onNavigateToAttendance,
                     iconBgColor = SoftTealContainer,
                     iconDarkBgColor = SoftTealContainerDark,
@@ -140,7 +138,7 @@ fun HomeScreen(
                 )
                 QuickActionTile(
                     title = "Apply Leave",
-                    icon = Icons.AutoMirrored.Outlined.EventNote,
+                    icon = AppIcons.Leave,
                     onClick = onNavigateToApplyLeave,
                     iconBgColor = SoftCoralContainer,
                     iconDarkBgColor = SoftCoralContainerDark,
@@ -149,7 +147,7 @@ fun HomeScreen(
                 )
                 QuickActionTile(
                     title = "Salary Slips",
-                    icon = Icons.AutoMirrored.Outlined.ReceiptLong,
+                    icon = AppIcons.Salary,
                     onClick = onNavigateToSalarySlips,
                     iconBgColor = SoftSandContainer,
                     iconDarkBgColor = SoftSandContainerDark,
@@ -166,7 +164,7 @@ fun HomeScreen(
             ) {
                 QuickActionTile(
                     title = "Holidays",
-                    icon = Icons.Outlined.BeachAccess,
+                    icon = AppIcons.Holiday,
                     onClick = onNavigateToHolidays,
                     iconBgColor = SoftSandContainer,
                     iconDarkBgColor = SoftSandContainerDark,
@@ -175,7 +173,7 @@ fun HomeScreen(
                 )
                 QuickActionTile(
                     title = "Approvals",
-                    icon = Icons.Outlined.HowToReg,
+                    icon = AppIcons.Approvals,
                     onClick = onNavigateToApprovals,
                     iconBgColor = SoftSuccessContainer,
                     iconDarkBgColor = SoftTealContainerDark,
@@ -184,7 +182,7 @@ fun HomeScreen(
                 )
                 QuickActionTile(
                     title = "History",
-                    icon = Icons.Outlined.History,
+                    icon = AppIcons.History,
                     onClick = onNavigateToAttendanceHistory,
                     iconBgColor = SoftTealContainer,
                     iconDarkBgColor = SoftTealContainerDark,
@@ -206,7 +204,7 @@ fun HomeScreen(
                     title = "Present Days",
                     value = "18 Days",
                     subtitle = "On Track",
-                    icon = Icons.Outlined.CheckCircle,
+                    icon = AppIcons.CheckCircle,
                     accentColor = SuccessLight,
                     modifier = Modifier.weight(1f)
                 )
@@ -214,7 +212,7 @@ fun HomeScreen(
                     title = "Leave Days",
                     value = "2 Days",
                     subtitle = "1 Pending",
-                    icon = Icons.Outlined.Event,
+                    icon = AppIcons.Event,
                     accentColor = WarmCoral,
                     modifier = Modifier.weight(1f)
                 )

@@ -2,9 +2,6 @@ package com.officemitra.app.feature.attendance
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun AttendanceCorrectionScreen(
@@ -62,7 +60,7 @@ fun AttendanceCorrectionScreen(
                     value = date,
                     onValueChange = { date = it },
                     label = "Date",
-                    leadingIcon = Icons.Outlined.CalendarToday
+                    leadingIcon = AppIcons.Calendar
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -71,7 +69,7 @@ fun AttendanceCorrectionScreen(
                     value = requestedTime,
                     onValueChange = { requestedTime = it },
                     label = "Requested Punch Timing",
-                    leadingIcon = Icons.Outlined.Edit
+                    leadingIcon = AppIcons.Edit
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))

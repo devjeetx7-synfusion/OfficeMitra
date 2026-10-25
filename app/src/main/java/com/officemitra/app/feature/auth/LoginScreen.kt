@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun LoginScreen(
@@ -72,7 +71,7 @@ fun LoginScreen(
                     onValueChange = viewModel::onEmailOrPhoneChanged,
                     label = "Email or Mobile Number",
                     placeholder = "alex.morgan@officemitra.com",
-                    leadingIcon = Icons.Outlined.Email,
+                    leadingIcon = AppIcons.Email,
                     isError = uiState.emailError != null,
                     errorMessage = uiState.emailError
                 )
@@ -106,7 +105,10 @@ fun LoginScreen(
                         )
                     }
 
-                    TextButton(onClick = onNavigateToForgotPassword) {
+                    TextButton(
+                        onClick = onNavigateToForgotPassword,
+                        modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                    ) {
                         Text(
                             text = "Forgot Password?",
                             style = MaterialTheme.typography.bodyMedium,
@@ -137,7 +139,10 @@ fun LoginScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                TextButton(onClick = onNavigateToRegister) {
+                TextButton(
+                    onClick = onNavigateToRegister,
+                    modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                ) {
                     Text(
                         text = "Create Account",
                         style = MaterialTheme.typography.bodyMedium,

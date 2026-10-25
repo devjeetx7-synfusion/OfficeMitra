@@ -4,8 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.officemitra.app.core.theme.AppIcons
 import com.officemitra.app.core.theme.BrandInk
 
 @Composable
@@ -74,7 +73,7 @@ fun SplashScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Business,
+                    imageVector = AppIcons.Business,
                     contentDescription = "Office Mitra Logo",
                     tint = Color.White,
                     modifier = Modifier.size(52.dp)

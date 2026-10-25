@@ -6,7 +6,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -18,10 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +34,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.officemitra.app.core.theme.*
 
@@ -63,7 +57,7 @@ fun SaaSScaffold(
     )
 }
 
-// 2. SaaSTopAppBar
+// 2. SaaSTopAppBar / OfficeMitraTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaaSTopAppBar(
@@ -87,7 +81,7 @@ fun SaaSTopAppBar(
             if (showBackButton) {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = AppIcons.ArrowBack,
                         contentDescription = "Back",
                         tint = MaterialTheme.colorScheme.onBackground
                     )
@@ -183,7 +177,7 @@ fun FloatingNavigationDock(
                             imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
                             contentDescription = item.title,
                             tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(24.dp) // Bottom navigation: 24dp
                         )
                         if (isSelected) {
                             Spacer(modifier = Modifier.width(6.dp))
@@ -337,7 +331,7 @@ fun GradientPrimaryButton(
                             imageVector = icon,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp) // Inline action icon: 20dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -481,7 +475,8 @@ fun FormTextField(
                     Icon(
                         imageVector = it,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp) // Inline icon: 20dp
                     )
                 }
             },
@@ -564,13 +559,17 @@ fun PasswordTextField(
         onValueChange = onValueChange,
         label = label,
         modifier = modifier,
-        leadingIcon = Icons.Outlined.Lock,
+        leadingIcon = AppIcons.Lock,
         trailingIcon = {
-            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+            IconButton(
+                onClick = { passwordVisible = !passwordVisible },
+                modifier = Modifier.size(48.dp) // Touch target 48dp
+            ) {
                 Icon(
-                    imageVector = if (passwordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                    imageVector = if (passwordVisible) AppIcons.View else AppIcons.ViewOff,
                     contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         },
@@ -587,7 +586,7 @@ fun PasswordTextField(
 @Composable
 fun InfoBanner(
     message: String,
-    icon: ImageVector = Icons.Outlined.Info,
+    icon: ImageVector = AppIcons.Info,
     backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
     contentColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier
@@ -634,7 +633,7 @@ fun QuickActionTile(
 
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.defaultMinSize(minHeight = 84.dp), // Touch target compliance
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
@@ -651,7 +650,7 @@ fun QuickActionTile(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(44.dp)
                         .clip(CircleShape)
                         .background(effectiveIconBg),
                     contentAlignment = Alignment.Center
@@ -660,7 +659,7 @@ fun QuickActionTile(
                         imageVector = icon,
                         contentDescription = title,
                         tint = if (isDark) MaterialTheme.colorScheme.primary else iconTint,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(24.dp) // Quick actions: 24-26dp
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -741,7 +740,7 @@ fun SummaryMetricCard(
                         imageVector = icon,
                         contentDescription = null,
                         tint = if (isDark) MaterialTheme.colorScheme.primary else accentColor,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -909,7 +908,8 @@ fun SectionHeader(
         if (actionText != null && onActionClick != null) {
             TextButton(
                 onClick = onActionClick,
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.defaultMinSize(minHeight = 48.dp)
             ) {
                 Text(
                     text = actionText,
@@ -927,7 +927,7 @@ fun SectionHeader(
 fun EmptyState(
     title: String,
     description: String,
-    icon: ImageVector = Icons.Outlined.Inbox,
+    icon: ImageVector = AppIcons.Inbox,
     actionLabel: String? = null,
     onActionClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -988,7 +988,7 @@ fun ErrorState(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Outlined.ErrorOutline,
+            imageVector = AppIcons.Error,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
@@ -1068,13 +1068,14 @@ fun ConfirmationDialog(
                     contentColor = if (isDanger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = confirmText, fontWeight = FontWeight.Bold)
+                Text(text = confirmText, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(
                     text = dismissText,
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -1139,13 +1140,14 @@ fun DatePickerField(
         onValueChange = onValueChange,
         label = label,
         modifier = modifier,
-        leadingIcon = Icons.Outlined.CalendarToday,
+        leadingIcon = AppIcons.Calendar,
         trailingIcon = {
             IconButton(onClick = {}) {
                 Icon(
-                    imageVector = Icons.Outlined.DateRange,
+                    imageVector = AppIcons.DateRange,
                     contentDescription = "Select Date",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

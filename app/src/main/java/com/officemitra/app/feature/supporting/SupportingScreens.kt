@@ -2,14 +2,11 @@ package com.officemitra.app.feature.supporting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun NoInternetScreen(
@@ -25,7 +22,7 @@ fun NoInternetScreen(
         EmptyState(
             title = "No Internet Connection",
             description = "Please check your Wi-Fi or mobile data connection and try again.",
-            icon = Icons.Outlined.WifiOff,
+            icon = AppIcons.WifiOff,
             actionLabel = "Retry Connection",
             onActionClick = onRetryClick
         )
@@ -45,7 +42,7 @@ fun AccessDeniedScreen(
         EmptyState(
             title = "Access Denied",
             description = "You do not have permission to access this module. Contact your HR administrator for authorization.",
-            icon = Icons.Outlined.Lock,
+            icon = AppIcons.Lock,
             actionLabel = "Go Back",
             onActionClick = onBackClick
         )
@@ -65,7 +62,7 @@ fun SessionExpiredScreen(
         EmptyState(
             title = "Session Expired",
             description = "Your session has expired due to inactivity. Please log in again to continue.",
-            icon = Icons.Outlined.Timer,
+            icon = AppIcons.Timer,
             actionLabel = "Log In Again",
             onActionClick = onNavigateToLogin
         )
