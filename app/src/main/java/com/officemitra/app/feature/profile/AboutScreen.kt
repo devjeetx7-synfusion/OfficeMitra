@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.OfficeMitraTopBar
-import com.officemitra.app.core.theme.PrimaryGradient
+import com.officemitra.app.core.theme.BrandInk
 
 @Composable
 fun AboutScreen(
@@ -44,7 +44,7 @@ fun AboutScreen(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(PrimaryGradient),
+                        .background(BrandInk),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -65,7 +65,7 @@ fun AboutScreen(
                 )
 
                 Text(
-                    text = "Version 3.0.0 (Gradient SaaS UI)",
+                    text = "Version 5.0.0 (Custom Crafted Workplace Experience)",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -73,7 +73,7 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "Office Mitra is a premium Gradient SaaS workforce management platform designed to streamline employee attendance, leave tracking, approvals, payroll documents, and company communications.",
+                    text = "Office Mitra V5.0 is a distinctive native Android workforce management application designed for seamless employee attendance tracking, leave requests, manager approvals, payroll document downloads, and company notifications.",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -81,7 +81,7 @@ fun AboutScreen(
             }
 
             Text(
-                text = "© 2025 Office Mitra SaaS Platform. All rights reserved.",
+                text = "© 2025 Office Mitra Platform. All rights reserved.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

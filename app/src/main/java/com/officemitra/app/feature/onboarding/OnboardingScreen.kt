@@ -17,18 +17,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.GradientPrimaryButton
+import com.officemitra.app.core.theme.SoftCoralContainer
+import com.officemitra.app.core.theme.SoftSandContainer
+import com.officemitra.app.core.theme.SoftTealContainer
 import kotlinx.coroutines.launch
 
 data class OnboardingPageData(
     val title: String,
     val description: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val containerColor: Color
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -41,17 +46,20 @@ fun OnboardingScreen(
         OnboardingPageData(
             title = "Smart Attendance Tracking",
             description = "Track your daily attendance effortlessly with live location verification and selfie photos.",
-            icon = Icons.Filled.AccessTime
+            icon = Icons.Filled.AccessTime,
+            containerColor = SoftTealContainer
         ),
         OnboardingPageData(
             title = "Seamless Leave Management",
             description = "Apply for casual, sick, or earned leaves and check your live approval status anytime.",
-            icon = Icons.Filled.CalendarMonth
+            icon = Icons.Filled.CalendarMonth,
+            containerColor = SoftCoralContainer
         ),
         OnboardingPageData(
             title = "Workforce Hub in One App",
             description = "Access company holiday calendars, salary slip PDF downloads, and team approvals instantly.",
-            icon = Icons.Filled.Dashboard
+            icon = Icons.Filled.Dashboard,
+            containerColor = SoftSandContainer
         )
     )
 
@@ -99,20 +107,20 @@ fun OnboardingScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(160.dp)
+                        .size(150.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
+                        .background(page.containerColor),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = page.icon,
                         contentDescription = page.title,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(80.dp)
+                        modifier = Modifier.size(72.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(36.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
                     text = page.title,

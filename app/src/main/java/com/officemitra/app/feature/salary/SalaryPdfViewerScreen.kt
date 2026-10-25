@@ -1,5 +1,6 @@
 package com.officemitra.app.feature.salary
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -18,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
-import com.officemitra.app.core.theme.PinkLight
+import com.officemitra.app.core.theme.WarmCoral
 
 @Composable
 fun SalaryPdfViewerScreen(
@@ -55,13 +56,13 @@ fun SalaryPdfViewerScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Card(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
                 shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Column(
                     modifier = Modifier
@@ -76,13 +77,13 @@ fun SalaryPdfViewerScreen(
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(PinkLight.copy(alpha = 0.15f)),
+                                .background(WarmCoral.copy(alpha = 0.12f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.PictureAsPdf,
                                 contentDescription = null,
-                                tint = PinkLight,
+                                tint = WarmCoral,
                                 modifier = Modifier.size(36.dp)
                             )
                         }
@@ -105,7 +106,7 @@ fun SalaryPdfViewerScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(14.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                             .padding(16.dp)
                     ) {
                         Text(

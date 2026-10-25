@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.GradientPrimaryButton
 import com.officemitra.app.core.components.OutlineButton
 import com.officemitra.app.core.components.SecondaryButton
-import com.officemitra.app.core.theme.PrimaryGradient
+import com.officemitra.app.core.theme.BrandInk
 
 @Composable
 fun WelcomeScreen(
@@ -44,7 +44,7 @@ fun WelcomeScreen(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(PrimaryGradient),
+                    .background(BrandInk),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -67,7 +67,7 @@ fun WelcomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Smart Workforce Management SaaS",
+                text = "Custom Crafted Workplace Experience",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

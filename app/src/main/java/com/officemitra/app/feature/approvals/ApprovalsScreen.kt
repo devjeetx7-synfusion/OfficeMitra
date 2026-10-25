@@ -1,5 +1,6 @@
 package com.officemitra.app.feature.approvals
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -44,12 +45,12 @@ fun ApprovalsScreen(
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
-            // Approver Role Toggle Info Card
-            Card(
+            // Approver Role Toggle Card
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Row(
                     modifier = Modifier

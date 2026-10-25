@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -116,7 +117,7 @@ fun OfficeMitraTopBar(
     )
 }
 
-// 3. SaaSBottomNavigation
+// 3. Floating Bottom Navigation Capsule
 data class BottomNavItem(
     val route: String,
     val title: String,
@@ -125,44 +126,79 @@ data class BottomNavItem(
 )
 
 @Composable
-fun SaaSBottomNavigation(
+fun FloatingNavigationDock(
     items: List<BottomNavItem>,
     currentRoute: String?,
     onItemClick: (BottomNavItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(64.dp),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+        shadowElevation = 3.dp
     ) {
-        items.forEach { item ->
-            val isSelected = currentRoute == item.route
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = { onItemClick(item) },
-                icon = {
-                    Icon(
-                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.title,
-                        modifier = Modifier.size(22.dp)
-                    )
-                },
-                label = {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = if (isSystemInDarkTheme()) Color.White else PrimaryLight,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEach { item ->
+                val isSelected = currentRoute == item.route
+                val interactionSource = remember { MutableInteractionSource() }
+                val isPressed by interactionSource.collectIsPressedAsState()
+
+                val scale by animateFloatAsState(
+                    targetValue = if (isPressed) 0.92f else 1.0f,
+                    animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
+                    label = "dock_item_scale"
                 )
-            )
+
+                val activePillColor = BrandTeal
+
+                Box(
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 52.dp, minHeight = 48.dp)
+                        .scale(scale)
+                        .clip(CircleShape)
+                        .background(if (isSelected) activePillColor else Color.Transparent)
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = { onItemClick(item) }
+                        )
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = item.title,
+                            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        if (isSelected) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = item.title,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -172,112 +208,15 @@ fun SplitFloatingDock(
     items: List<BottomNavItem>,
     currentRoute: String?,
     onItemClick: (BottomNavItem) -> Unit,
-    onQuickPunchClick: () -> Unit,
+    onQuickPunchClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    FloatingNavigationDock(
+        items = items,
+        currentRoute = currentRoute,
+        onItemClick = onItemClick,
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        // Floating Capsule
-        Surface(
-            modifier = Modifier.weight(1f),
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 6.dp,
-            shadowElevation = 8.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                items.forEach { item ->
-                    val isSelected = currentRoute == item.route
-                    val interactionSource = remember { MutableInteractionSource() }
-                    val isPressed by interactionSource.collectIsPressedAsState()
-
-                    val scale by animateFloatAsState(
-                        targetValue = if (isPressed) 0.90f else 1.0f,
-                        animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
-                        label = "icon_scale"
-                    )
-
-                    val activeBgColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
-                    } else {
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
-                            .scale(scale)
-                            .clip(CircleShape)
-                            .background(if (isSelected) activeBgColor else Color.Transparent)
-                            .clickable(
-                                interactionSource = interactionSource,
-                                indication = null,
-                                onClick = { onItemClick(item) }
-                            )
-                            .padding(horizontal = 12.dp, vertical = 10.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                            contentDescription = item.title,
-                            tint = if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                            },
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // Quick Punch Circular Button
-        val quickPunchInteraction = remember { MutableInteractionSource() }
-        val isQuickPunchPressed by quickPunchInteraction.collectIsPressedAsState()
-        val quickPunchScale by animateFloatAsState(
-            targetValue = if (isQuickPunchPressed) 0.92f else 1.0f,
-            animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
-            label = "quick_punch_scale"
-        )
-
-        Surface(
-            onClick = onQuickPunchClick,
-            modifier = Modifier
-                .size(60.dp)
-                .scale(quickPunchScale),
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary,
-            tonalElevation = 6.dp,
-            shadowElevation = 8.dp,
-            interactionSource = quickPunchInteraction
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.CameraAlt,
-                    contentDescription = "Quick Punch",
-                    tint = Color.White,
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-        }
-    }
+    )
 }
 
 @Composable
@@ -285,50 +224,49 @@ fun OfficeMitraBottomBar(
     items: List<BottomNavItem>,
     currentRoute: String?,
     onItemClick: (BottomNavItem) -> Unit,
-    onQuickPunchClick: () -> Unit = {}
+    onQuickPunchClick: (() -> Unit)? = null
 ) {
-    SplitFloatingDock(
+    FloatingNavigationDock(
         items = items,
         currentRoute = currentRoute,
-        onItemClick = onItemClick,
-        onQuickPunchClick = onQuickPunchClick
+        onItemClick = onItemClick
     )
 }
 
-// 4. GradientHeroCard
+@Composable
+fun SaaSBottomNavigation(
+    items: List<BottomNavItem>,
+    currentRoute: String?,
+    onItemClick: (BottomNavItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FloatingNavigationDock(
+        items = items,
+        currentRoute = currentRoute,
+        onItemClick = onItemClick,
+        modifier = modifier
+    )
+}
+
+// 4. HeroCard
 @Composable
 fun GradientHeroCard(
-    gradient: Brush = PrimaryGradient,
+    gradient: Brush = MidnightHeroGradient,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 20.dp,
+    cornerRadius: Dp = 22.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(cornerRadius),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(gradient)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .offset(x = 220.dp, y = (-30).dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.08f))
-            )
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .offset(x = (-20).dp, y = 80.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.06f))
-            )
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -340,7 +278,7 @@ fun GradientHeroCard(
     }
 }
 
-// 5. GradientPrimaryButton & Standard Buttons
+// 5. Custom Buttons
 @Composable
 fun GradientPrimaryButton(
     text: String,
@@ -350,7 +288,7 @@ fun GradientPrimaryButton(
     enabled: Boolean = true,
     isLoading: Boolean = false,
     icon: ImageVector? = null,
-    height: Dp = 54.dp
+    height: Dp = 52.dp
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -367,7 +305,7 @@ fun GradientPrimaryButton(
             .height(height)
             .scale(scale),
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.Transparent,
         interactionSource = interactionSource
     ) {
@@ -450,7 +388,7 @@ fun SecondaryButton(
             .fillMaxWidth()
             .height(52.dp),
         enabled = enabled,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.filledTonalButtonColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.primary
@@ -491,8 +429,8 @@ fun OutlineButton(
             .fillMaxWidth()
             .height(52.dp),
         enabled = enabled,
-        shape = RoundedCornerShape(14.dp),
-        border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.5.dp)
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -555,7 +493,7 @@ fun FormTextField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             visualTransformation = visualTransformation,
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -687,24 +625,24 @@ fun QuickActionTile(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    iconBgColor: Color = PastelBlue,
-    iconDarkBgColor: Color = PastelBlueDark,
-    iconTint: Color = SecondaryLight,
+    iconBgColor: Color = SoftTealContainer,
+    iconDarkBgColor: Color = SoftTealContainerDark,
+    iconTint: Color = BrandTeal,
     badgeCount: Int = 0
 ) {
     val isDark = isSystemInDarkTheme()
     val effectiveIconBg = if (isDark) iconDarkBgColor else iconBgColor
 
-    Card(
+    Surface(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     ) {
         Box(
             modifier = Modifier
-                .padding(vertical = 10.dp, horizontal = 8.dp)
+                .padding(vertical = 12.dp, horizontal = 8.dp)
                 .fillMaxWidth()
         ) {
             Column(
@@ -726,7 +664,7 @@ fun QuickActionTile(
                         modifier = Modifier.size(22.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.labelMedium,
@@ -774,28 +712,28 @@ fun SummaryMetricCard(
     value: String,
     subtitle: String? = null,
     icon: ImageVector? = null,
-    accentColor: Color = PrimaryLight,
+    accentColor: Color = BrandTeal,
     modifier: Modifier = Modifier
 ) {
     val isDark = isSystemInDarkTheme()
     val iconBg = if (isDark) accentColor.copy(alpha = 0.2f) else accentColor.copy(alpha = 0.12f)
 
-    Card(
+    Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(14.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(42.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(iconBg),
                     contentAlignment = Alignment.Center
@@ -804,10 +742,10 @@ fun SummaryMetricCard(
                         imageVector = icon,
                         contentDescription = null,
                         tint = if (isDark) MaterialTheme.colorScheme.primary else accentColor,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -842,7 +780,7 @@ fun SummaryCard(
     value: String,
     subtitle: String? = null,
     icon: ImageVector? = null,
-    accentColor: Color = PrimaryLight,
+    accentColor: Color = BrandTeal,
     modifier: Modifier = Modifier
 ) {
     SummaryMetricCard(
@@ -865,24 +803,24 @@ fun StatusChip(
 
     val (bgColor, textColor) = when (status.lowercase()) {
         "present", "approved", "completed", "success", "punched in" -> {
-            if (isDark) Color(0xFF065F46) to Color(0xFFA7F3D0)
-            else SuccessLight.copy(alpha = 0.18f) to Color(0xFF047857)
+            if (isDark) Color(0xFF0F3B2E) to Color(0xFF58C8B8)
+            else SoftSuccessContainer to SuccessLight
         }
         "absent", "rejected", "failed", "cancelled" -> {
-            if (isDark) Color(0xFF991B1B) to Color(0xFFFECACA)
-            else ErrorLight.copy(alpha = 0.18f) to Color(0xFFB91C1C)
+            if (isDark) SoftCoralContainerDark to ErrorDark
+            else SoftCoralContainer to ErrorLight
         }
         "pending", "half day", "warning", "not punched" -> {
-            if (isDark) Color(0xFF92400E) to Color(0xFFFDE68A)
-            else Color(0xFFFEF3C7) to Color(0xFFB45309)
+            if (isDark) SoftSandContainerDark to WarningDark
+            else SoftWarningContainer to WarningLight
         }
         "leave", "on leave" -> {
-            if (isDark) Color(0xFF5B21B6) to Color(0xFFDDD6FE)
-            else PrimaryLight.copy(alpha = 0.18f) to Color(0xFF4338CA)
+            if (isDark) SoftTealContainerDark to PrimaryTealDark
+            else SoftTealContainer to BrandTeal
         }
         else -> {
             if (isDark) BorderDark to TextSecondaryDark
-            else BorderLight to TextSecondaryLight
+            else SurfaceMuted to TextSecondaryLight
         }
     }
 
@@ -915,7 +853,7 @@ fun EmployeeAvatar(
     imageUrl: String?,
     name: String,
     modifier: Modifier = Modifier,
-    size: Int = 48
+    size: Int = 46
 ) {
     Box(
         modifier = modifier
@@ -959,7 +897,7 @@ fun SectionHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -1004,7 +942,7 @@ fun EmptyState(
     ) {
         Box(
             modifier = Modifier
-                .size(72.dp)
+                .size(68.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
@@ -1013,7 +951,7 @@ fun EmptyState(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(32.dp)
             )
         }
         Spacer(modifier = Modifier.height(16.dp))

@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.officemitra.app.core.theme.PrimaryGradient
+import com.officemitra.app.core.theme.BrandInk
 
 @Composable
 fun SplashScreen(
@@ -67,17 +67,17 @@ fun SplashScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(96.dp)
                     .scale(scale.value)
                     .clip(CircleShape)
-                    .background(PrimaryGradient),
+                    .background(BrandInk),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.Business,
                     contentDescription = "Office Mitra Logo",
                     tint = Color.White,
-                    modifier = Modifier.size(54.dp)
+                    modifier = Modifier.size(52.dp)
                 )
             }
 
@@ -90,10 +90,10 @@ fun SplashScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Smart Workforce Management SaaS",
+                text = "Custom Crafted Workplace Experience",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

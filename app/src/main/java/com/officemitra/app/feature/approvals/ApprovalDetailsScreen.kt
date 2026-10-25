@@ -1,11 +1,13 @@
 package com.officemitra.app.feature.approvals
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,11 +42,11 @@ fun ApprovalDetailsScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             request?.let { req ->
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Row(
@@ -122,8 +124,8 @@ fun ApprovalDetailsScreen(
                             request?.let { viewModel.updateApprovalStatus(it.id, false, comment) }
                             onBackClick()
                         },
-                        modifier = Modifier.weight(1f).height(50.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text("Reject", fontWeight = FontWeight.Bold)
@@ -133,9 +135,9 @@ fun ApprovalDetailsScreen(
                             request?.let { viewModel.updateApprovalStatus(it.id, true, comment) }
                             onBackClick()
                         },
-                        modifier = Modifier.weight(1f).height(50.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SuccessLight, contentColor = androidx.compose.ui.graphics.Color.White)
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SuccessLight, contentColor = Color.White)
                     ) {
                         Text("Approve", fontWeight = FontWeight.Bold)
                     }

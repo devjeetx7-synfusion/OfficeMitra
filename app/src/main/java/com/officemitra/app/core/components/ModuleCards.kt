@@ -1,6 +1,8 @@
 package com.officemitra.app.core.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.theme.*
 
-// 1. AttendanceStatusCard
+// 1. AttendanceStatusCard (Solid Midnight Ink #14232B)
 @Composable
 fun AttendanceStatusCard(
     date: String,
@@ -32,82 +34,89 @@ fun AttendanceStatusCard(
     isPunchedIn: Boolean,
     modifier: Modifier = Modifier
 ) {
-    GradientHeroCard(
-        gradient = PrimaryGradient,
-        cornerRadius = 18.dp,
-        modifier = modifier
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = BrandInk,
+        shadowElevation = 0.dp
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.AccessTime,
+                        contentDescription = null,
+                        tint = TealLight,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+                }
+                StatusChip(status = status)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.White.copy(alpha = 0.08f))
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(text = "Punch In", style = MaterialTheme.typography.labelSmall, color = TealLight)
+                    Text(text = punchIn, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                Column {
+                    Text(text = "Punch Out", style = MaterialTheme.typography.labelSmall, color = TealLight)
+                    Text(text = punchOut, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                Column {
+                    Text(text = "Working Duration", style = MaterialTheme.typography.labelSmall, color = TealLight)
+                    Text(text = workingDuration, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onPunchClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BrandTeal,
+                    contentColor = Color.White
+                )
+            ) {
                 Icon(
-                    imageVector = Icons.Outlined.AccessTime,
+                    imageVector = if (isPunchedIn) Icons.AutoMirrored.Outlined.Logout else Icons.Outlined.Login,
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(18.dp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = date,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
+                    text = if (isPunchedIn) "Punch Out Now" else "Punch In Now",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
                 )
             }
-            StatusChip(status = status)
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White.copy(alpha = 0.12f))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(text = "Punch In", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.75f))
-                Text(text = punchIn, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-            Column {
-                Text(text = "Punch Out", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.75f))
-                Text(text = punchOut, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-            Column {
-                Text(text = "Working Duration", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.75f))
-                Text(text = workingDuration, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = onPunchClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(42.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = PrimaryLight
-            )
-        ) {
-            Icon(
-                imageVector = if (isPunchedIn) Icons.AutoMirrored.Outlined.Logout else Icons.Outlined.Login,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = if (isPunchedIn) "Punch Out Now" else "Punch In Now",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 }
@@ -146,77 +155,85 @@ fun LeaveBalanceCard(
     earnedRemaining: Int,
     modifier: Modifier = Modifier
 ) {
-    GradientHeroCard(
-        gradient = LeaveGradient,
-        modifier = modifier
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = BrandInk,
+        shadowElevation = 0.dp
     ) {
-        Text(
-            text = "Leave Balances",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
         ) {
-            Column {
-                Text(text = "Total Allocated", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
-                Text(text = "$totalLeave Days", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-            Column {
-                Text(text = "Used", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
-                Text(text = "$usedLeave Days", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-            Column {
-                Text(text = "Remaining", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
-                Text(text = "$remainingLeave Days", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-        }
+            Text(
+                text = "Leave Balances",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White.copy(alpha = 0.15f))
-                    .padding(10.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(text = "Casual", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
-                    Text(text = "$casualRemaining left", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(text = "Total Allocated", style = MaterialTheme.typography.bodySmall, color = TealLight)
+                    Text(text = "$totalLeave Days", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                Column {
+                    Text(text = "Used", style = MaterialTheme.typography.bodySmall, color = TealLight)
+                    Text(text = "$usedLeave Days", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                Column {
+                    Text(text = "Remaining", style = MaterialTheme.typography.bodySmall, color = TealLight)
+                    Text(text = "$remainingLeave Days", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White.copy(alpha = 0.15f))
-                    .padding(10.dp)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column {
-                    Text(text = "Sick", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
-                    Text(text = "$sickRemaining left", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White.copy(alpha = 0.08f))
+                        .padding(10.dp)
+                ) {
+                    Column {
+                        Text(text = "Casual", style = MaterialTheme.typography.labelSmall, color = TealLight)
+                        Text(text = "$casualRemaining left", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
-            }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White.copy(alpha = 0.15f))
-                    .padding(10.dp)
-            ) {
-                Column {
-                    Text(text = "Earned", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
-                    Text(text = "$earnedRemaining left", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White.copy(alpha = 0.08f))
+                        .padding(10.dp)
+                ) {
+                    Column {
+                        Text(text = "Sick", style = MaterialTheme.typography.labelSmall, color = TealLight)
+                        Text(text = "$sickRemaining left", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White.copy(alpha = 0.08f))
+                        .padding(10.dp)
+                ) {
+                    Column {
+                        Text(text = "Earned", style = MaterialTheme.typography.labelSmall, color = TealLight)
+                        Text(text = "$earnedRemaining left", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
             }
         }
@@ -235,11 +252,11 @@ fun LeaveRequestCard(
     onCancelClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -317,7 +334,7 @@ fun LeaveRequestCard(
                         .height(38.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
                 ) {
                     Text(
                         text = "Cancel Request",
@@ -330,7 +347,7 @@ fun LeaveRequestCard(
     }
 }
 
-// 4. NotificationCard
+// 4. NotificationCard / Timeline Item
 @Composable
 fun NotificationCard(
     title: String,
@@ -348,18 +365,16 @@ fun NotificationCard(
         else -> Icons.Outlined.Notifications
     }
 
-    Card(
+    Surface(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (!isRead) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            1.dp,
+            if (!isRead) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+            else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -367,7 +382,7 @@ fun NotificationCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(38.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
@@ -376,7 +391,7 @@ fun NotificationCard(
                     imageVector = categoryIcon,
                     contentDescription = category,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
@@ -438,11 +453,11 @@ fun SalarySlipCard(
     onDownloadPdf: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     ) {
         Row(
             modifier = Modifier
@@ -452,16 +467,16 @@ fun SalarySlipCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(PinkLight.copy(alpha = 0.15f)),
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(WarmCoral.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.PictureAsPdf,
                     contentDescription = "PDF",
-                    tint = PinkLight,
-                    modifier = Modifier.size(26.dp)
+                    tint = WarmCoral,
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
@@ -517,13 +532,11 @@ fun HolidayCard(
     isUpcoming: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isUpcoming) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isUpcoming) 2.dp else 0.dp)
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     ) {
         Row(
             modifier = Modifier
@@ -533,8 +546,8 @@ fun HolidayCard(
         ) {
             Column(
                 modifier = Modifier
-                    .width(62.dp)
-                    .clip(RoundedCornerShape(14.dp))
+                    .width(60.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(
                         if (isUpcoming) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
                     )
@@ -591,11 +604,11 @@ fun ApprovalCard(
     modifier: Modifier = Modifier,
     isAuthorizedApprover: Boolean = true
 ) {
-    Card(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -659,16 +672,16 @@ fun ApprovalCard(
                 ) {
                     OutlinedButton(
                         onClick = onRejectClick,
-                        modifier = Modifier.weight(1f).height(42.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f).height(40.dp),
+                        shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text("Reject", fontWeight = FontWeight.Bold)
                     }
                     Button(
                         onClick = onApproveClick,
-                        modifier = Modifier.weight(1f).height(42.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f).height(40.dp),
+                        shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = SuccessLight, contentColor = Color.White)
                     ) {
                         Text("Approve", fontWeight = FontWeight.Bold)
@@ -691,15 +704,19 @@ fun ProfileHeader(
     onEditClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    GradientHeroCard(
-        gradient = PrimaryGradient,
-        modifier = modifier
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = BrandInk,
+        shadowElevation = 0.dp
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            EmployeeAvatar(imageUrl = imageUrl, name = name, size = 64)
+            EmployeeAvatar(imageUrl = imageUrl, name = name, size = 60)
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -711,7 +728,7 @@ fun ProfileHeader(
                 Text(
                     text = "$designation • $department",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f)
+                    color = TealLight
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
@@ -725,7 +742,7 @@ fun ProfileHeader(
                     onClick = onEditClick,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f))
+                        .background(Color.White.copy(alpha = 0.12f))
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,

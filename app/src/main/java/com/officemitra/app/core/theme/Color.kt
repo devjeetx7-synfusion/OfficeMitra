@@ -3,70 +3,101 @@ package com.officemitra.app.core.theme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-// Light Theme
-val PrimaryLight = Color(0xFF635BFF)
-val SecondaryLight = Color(0xFF2563EB)
-val CyanLight = Color(0xFF06B6D4)
-val PinkLight = Color(0xFFEC4899)
-val BackgroundLight = Color(0xFFF7F8FC)
+// V5.0 Design Tokens - Light Theme
+val BrandInk = Color(0xFF14232B)
+val BrandTeal = Color(0xFF007F78)
+val TealDark = Color(0xFF006963)
+val TealLight = Color(0xFFD8F3E9)
+val WarmCoral = Color(0xFFEF795C)
+val WarmSand = Color(0xFFF5E8D5)
+val AppCanvas = Color(0xFFF6F8F6)
 val SurfaceLight = Color(0xFFFFFFFF)
-val TextPrimaryLight = Color(0xFF111827)
-val TextSecondaryLight = Color(0xFF6B7280)
-val BorderLight = Color(0xFFE5E7EB)
-val SuccessLight = Color(0xFF10B981)
-val WarningLight = Color(0xFFD97706)
-val ErrorLight = Color(0xFFDC2626)
+val SurfaceMuted = Color(0xFFEEF3F1)
+val TextPrimaryLight = Color(0xFF14232B)
+val TextSecondaryLight = Color(0xFF62737A)
+val BorderLight = Color(0xFFE2EAE7)
+val SuccessLight = Color(0xFF078568)
+val WarningLight = Color(0xFFA86512)
+val ErrorLight = Color(0xFFC23D45)
 
-// Aliases for compatibility
-val SuccessColor = SuccessLight
-val WarningColor = WarningLight
-val ErrorColor = ErrorLight
-val PrimaryDarkColor = Color(0xFF1D4ED8)
-val SecondaryDarkScheme = Color(0xFF94A3B8)
-val PrimaryDarkScheme = Color(0xFF3B82F6)
-
-// Dark Theme
-val BackgroundDark = Color(0xFF0B1020)
-val SurfaceDark = Color(0xFF172033)
-val ElevatedSurfaceDark = Color(0xFF202C43)
-val PrimaryDark = Color(0xFFA5B4FC)
-val SecondaryDark = Color(0xFF60A5FA)
-val TextPrimaryDark = Color(0xFFF9FAFB)
-val TextSecondaryDark = Color(0xFFCBD5E1)
-val BorderDark = Color(0xFF334155)
+// V5.0 Design Tokens - Dark Theme
+val BackgroundDark = Color(0xFF101A1E)
+val SurfaceDark = Color(0xFF19272B)
+val ElevatedSurfaceDark = Color(0xFF223338)
+val PrimaryTealDark = Color(0xFF58C8B8)
+val PrimaryTextDark = Color(0xFFF2F7F5)
+val SecondaryTextDark = Color(0xFFB4C6C5)
+val BorderDark = Color(0xFF34474B)
 val SuccessDark = Color(0xFF34D399)
 val WarningDark = Color(0xFFFBBF24)
 val ErrorDark = Color(0xFFF87171)
 
-// Gradients
+// Backward Compatibility Aliases & Semantic Colors
+val PrimaryLight = BrandTeal
+val SecondaryLight = TealDark
+val PrimaryDark = PrimaryTealDark
+val SecondaryDark = PrimaryTealDark
+val BackgroundLight = AppCanvas
+val TextPrimaryDark = PrimaryTextDark
+val TextSecondaryDark = SecondaryTextDark
+val SuccessColor = SuccessLight
+val WarningColor = WarningLight
+val ErrorColor = ErrorLight
+val PrimaryDarkColor = TealDark
+val SecondaryDarkScheme = SecondaryTextDark
+val PrimaryDarkScheme = PrimaryTealDark
+val CyanLight = BrandTeal
+val PinkLight = WarmCoral
+
+// V5.0 Gradients (Subtle & Purposeful)
+val MidnightHeroGradient = Brush.linearGradient(
+    colors = listOf(BrandInk, Color(0xFF1C2F3A))
+)
+
 val PrimaryGradient = Brush.linearGradient(
-    colors = listOf(Color(0xFF635BFF), Color(0xFF2563EB))
+    colors = listOf(BrandTeal, TealDark)
 )
 
 val AttendanceGradient = Brush.linearGradient(
-    colors = listOf(Color(0xFF06B6D4), Color(0xFF2563EB))
+    colors = listOf(BrandInk, Color(0xFF1E323D))
 )
 
 val LeaveGradient = Brush.linearGradient(
-    colors = listOf(Color(0xFFEC4899), Color(0xFF8B5CF6))
+    colors = listOf(BrandTeal, Color(0xFF005A55))
 )
 
 val SuccessGradient = Brush.linearGradient(
-    colors = listOf(Color(0xFF10B981), Color(0xFF059669))
+    colors = listOf(SuccessLight, Color(0xFF05654F))
 )
 
-// Pastel Icon Containers
-val PastelBlue = Color(0xFFE0F2FE)
-val PastelViolet = Color(0xFFEDE9FE)
-val PastelPink = Color(0xFFFCE7F3)
-val PastelCyan = Color(0xFFCFFAFE)
-val PastelGreen = Color(0xFFD1FAE5)
-val PastelAmber = Color(0xFFFEF3C7)
-val PastelRose = Color(0xFFFFE4E6)
+val WarmAccentGradient = Brush.linearGradient(
+    colors = listOf(WarmCoral, Color(0xFFD96347))
+)
 
-val PastelBlueDark = Color(0xFF1E3A8A).copy(alpha = 0.4f)
-val PastelVioletDark = Color(0xFF4C1D95).copy(alpha = 0.4f)
-val PastelPinkDark = Color(0xFF831843).copy(alpha = 0.4f)
-val PastelCyanDark = Color(0xFF164E63).copy(alpha = 0.4f)
-val PastelGreenDark = Color(0xFF064E3B).copy(alpha = 0.4f)
-val PastelAmberDark = Color(0xFF78350F).copy(alpha = 0.4f)
+// Soft Icon Container Accents
+val SoftTealContainer = TealLight
+val SoftCoralContainer = Color(0xFFFDECE8)
+val SoftSandContainer = WarmSand
+val SoftMutedContainer = SurfaceMuted
+val SoftSuccessContainer = Color(0xFFE3F6F1)
+val SoftWarningContainer = Color(0xFFFEF3E6)
+
+val SoftTealContainerDark = Color(0xFF163C38)
+val SoftCoralContainerDark = Color(0xFF42221C)
+val SoftSandContainerDark = Color(0xFF3D3425)
+val SoftMutedContainerDark = Color(0xFF1E2D32)
+
+// Compatibility Aliases for Soft Icon Containers
+val PastelCyan = SoftTealContainer
+val PastelCyanDark = SoftTealContainerDark
+val PastelPink = SoftCoralContainer
+val PastelPinkDark = SoftCoralContainerDark
+val PastelViolet = SoftTealContainer
+val PastelVioletDark = SoftTealContainerDark
+val PastelAmber = SoftSandContainer
+val PastelAmberDark = SoftSandContainerDark
+val PastelGreen = SoftSuccessContainer
+val PastelGreenDark = SoftTealContainerDark
+val PastelBlue = SoftTealContainer
+val PastelBlueDark = SoftTealContainerDark
+val PastelRose = SoftCoralContainer
