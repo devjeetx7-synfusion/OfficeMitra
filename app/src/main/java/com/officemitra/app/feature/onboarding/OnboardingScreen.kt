@@ -7,10 +7,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.GradientPrimaryButton
+import com.officemitra.app.core.theme.AppIcons
 import com.officemitra.app.core.theme.SoftCoralContainer
 import com.officemitra.app.core.theme.SoftSandContainer
 import com.officemitra.app.core.theme.SoftTealContainer
@@ -46,19 +43,19 @@ fun OnboardingScreen(
         OnboardingPageData(
             title = "Smart Attendance Tracking",
             description = "Track your daily attendance effortlessly with live location verification and selfie photos.",
-            icon = Icons.Filled.AccessTime,
+            icon = AppIcons.Attendance,
             containerColor = SoftTealContainer
         ),
         OnboardingPageData(
             title = "Seamless Leave Management",
             description = "Apply for casual, sick, or earned leaves and check your live approval status anytime.",
-            icon = Icons.Filled.CalendarMonth,
+            icon = AppIcons.CalendarMonth,
             containerColor = SoftCoralContainer
         ),
         OnboardingPageData(
             title = "Workforce Hub in One App",
             description = "Access company holiday calendars, salary slip PDF downloads, and team approvals instantly.",
-            icon = Icons.Filled.Dashboard,
+            icon = AppIcons.Dashboard,
             containerColor = SoftSandContainer
         )
     )
@@ -78,9 +75,12 @@ fun OnboardingScreen(
             horizontalArrangement = Arrangement.End
         ) {
             if (pagerState.currentPage < pages.size - 1) {
-                TextButton(onClick = {
-                    viewModel.completeOnboarding(onFinishOnboarding)
-                }) {
+                TextButton(
+                    onClick = {
+                        viewModel.completeOnboarding(onFinishOnboarding)
+                    },
+                    modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                ) {
                     Text(
                         text = "Skip",
                         style = MaterialTheme.typography.titleMedium,

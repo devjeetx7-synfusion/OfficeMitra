@@ -7,9 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun ProfileScreen(
@@ -74,13 +72,13 @@ fun ProfileScreen(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    InfoRow(label = "Email Address", value = uiState.user.email, icon = Icons.Outlined.Email)
+                    InfoRow(label = "Email Address", value = uiState.user.email, icon = AppIcons.Email)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                    InfoRow(label = "Mobile Number", value = uiState.user.phone, icon = Icons.Outlined.Phone)
+                    InfoRow(label = "Mobile Number", value = uiState.user.phone, icon = AppIcons.Phone)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                    InfoRow(label = "Company Name", value = uiState.user.companyName, icon = Icons.Outlined.Business)
+                    InfoRow(label = "Company Name", value = uiState.user.companyName, icon = AppIcons.Business)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                    InfoRow(label = "Joining Date", value = uiState.user.joiningDate, icon = Icons.Outlined.CalendarToday)
+                    InfoRow(label = "Joining Date", value = uiState.user.joiningDate, icon = AppIcons.Calendar)
                 }
             }
 
@@ -98,25 +96,25 @@ fun ProfileScreen(
                 Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     SettingOptionRow(
                         title = "Edit Profile Info",
-                        icon = Icons.Outlined.Person,
+                        icon = AppIcons.Profile,
                         onClick = onNavigateToEditProfile
                     )
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     SettingOptionRow(
                         title = "Change Password",
-                        icon = Icons.Outlined.Lock,
+                        icon = AppIcons.Lock,
                         onClick = onNavigateToChangePassword
                     )
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     SettingOptionRow(
                         title = "App Preferences & Theme",
-                        icon = Icons.Outlined.Settings,
+                        icon = AppIcons.Settings,
                         onClick = onNavigateToAppSettings
                     )
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     SettingOptionRow(
                         title = "About Office Mitra",
-                        icon = Icons.Outlined.Info,
+                        icon = AppIcons.Info,
                         onClick = onNavigateToAboutApp
                     )
                 }
@@ -129,7 +127,7 @@ fun ProfileScreen(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
@@ -137,7 +135,11 @@ fun ProfileScreen(
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.AutoMirrored.Outlined.Logout, contentDescription = "Logout")
+                    Icon(
+                        imageVector = AppIcons.PunchOut,
+                        contentDescription = "Logout",
+                        modifier = Modifier.size(20.dp)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Log Out", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 }
@@ -169,7 +171,7 @@ private fun InfoRow(label: String, value: String, icon: ImageVector) {
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp) // Settings & Info row icon: 20dp
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column {
@@ -194,15 +196,16 @@ private fun SettingOptionRow(title: String, icon: ImageVector, onClick: () -> Un
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(22.dp) // Settings options icon: 20-22dp
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(text = title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         }
         Icon(
-            imageVector = Icons.Outlined.ChevronRight,
+            imageVector = AppIcons.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
         )
     }
 }

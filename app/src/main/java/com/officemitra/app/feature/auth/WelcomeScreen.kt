@@ -3,8 +3,6 @@ package com.officemitra.app.feature.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.GradientPrimaryButton
 import com.officemitra.app.core.components.OutlineButton
 import com.officemitra.app.core.components.SecondaryButton
+import com.officemitra.app.core.theme.AppIcons
 import com.officemitra.app.core.theme.BrandInk
 
 @Composable
@@ -48,7 +47,7 @@ fun WelcomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Business,
+                    imageVector = AppIcons.Business,
                     contentDescription = "Office Mitra",
                     tint = Color.White,
                     modifier = Modifier.size(44.dp)
@@ -100,7 +99,10 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            TextButton(onClick = onNavigateToTermsDemo) {
+            TextButton(
+                onClick = onNavigateToTermsDemo,
+                modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+            ) {
                 Text(
                     text = "Privacy Policy & Terms of Service (Demo Links)",
                     style = MaterialTheme.typography.bodySmall,

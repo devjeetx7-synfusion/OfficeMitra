@@ -2,14 +2,13 @@ package com.officemitra.app.feature.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun ForgotPasswordScreen(
@@ -59,7 +58,7 @@ fun ForgotPasswordScreen(
                         onValueChange = { email = it },
                         label = "Email Address",
                         placeholder = "alex.morgan@officemitra.com",
-                        leadingIcon = Icons.Outlined.Email
+                        leadingIcon = AppIcons.Email
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))

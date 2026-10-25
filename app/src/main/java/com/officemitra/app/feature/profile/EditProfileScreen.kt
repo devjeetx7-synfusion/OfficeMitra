@@ -4,10 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun EditProfileScreen(
@@ -65,7 +62,7 @@ fun EditProfileScreen(
                     value = name,
                     onValueChange = { name = it },
                     label = "Full Name",
-                    leadingIcon = Icons.Outlined.Person
+                    leadingIcon = AppIcons.Person
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -74,7 +71,7 @@ fun EditProfileScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = "Email Address",
-                    leadingIcon = Icons.Outlined.Email
+                    leadingIcon = AppIcons.Email
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -83,7 +80,7 @@ fun EditProfileScreen(
                     value = phone,
                     onValueChange = { phone = it },
                     label = "Mobile Number",
-                    leadingIcon = Icons.Outlined.Phone
+                    leadingIcon = AppIcons.Phone
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))

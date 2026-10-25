@@ -5,9 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 import com.officemitra.app.core.theme.WarmCoral
 
 @Composable
@@ -40,11 +38,15 @@ fun SalaryPdfViewerScreen(
             showBackButton = true,
             onBackClick = onBackClick,
             actions = {
-                IconButton(onClick = {}) {
+                IconButton(
+                    onClick = {},
+                    modifier = Modifier.size(48.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Outlined.Download,
+                        imageVector = AppIcons.Download,
                         contentDescription = "Download PDF",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -81,7 +83,7 @@ fun SalaryPdfViewerScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.PictureAsPdf,
+                                imageVector = AppIcons.Pdf,
                                 contentDescription = null,
                                 tint = WarmCoral,
                                 modifier = Modifier.size(36.dp)

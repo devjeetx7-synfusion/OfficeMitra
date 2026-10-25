@@ -6,12 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Phone
-import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun JoinCompanyScreen(
@@ -57,7 +52,7 @@ fun JoinCompanyScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Business,
+                    imageVector = AppIcons.Business,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(32.dp)
@@ -94,7 +89,7 @@ fun JoinCompanyScreen(
                 onValueChange = viewModel::onCompanyCodeChanged,
                 label = "Company Code",
                 placeholder = "OM-10245",
-                leadingIcon = Icons.Outlined.QrCode,
+                leadingIcon = AppIcons.QrCode,
                 isError = uiState.codeError != null,
                 errorMessage = uiState.codeError
             )
@@ -143,7 +138,7 @@ fun JoinCompanyScreen(
                 onValueChange = viewModel::onEmployeeIdChanged,
                 label = "Employee ID (Optional)",
                 placeholder = "EMP-1024",
-                leadingIcon = Icons.Outlined.Badge
+                leadingIcon = AppIcons.Badge
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -152,7 +147,7 @@ fun JoinCompanyScreen(
                 value = uiState.fullName,
                 onValueChange = viewModel::onFullNameChanged,
                 label = "Full Name",
-                leadingIcon = Icons.Outlined.Person
+                leadingIcon = AppIcons.Person
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -161,7 +156,7 @@ fun JoinCompanyScreen(
                 value = uiState.mobileNumber,
                 onValueChange = viewModel::onMobileChanged,
                 label = "Registered Mobile Number",
-                leadingIcon = Icons.Outlined.Phone
+                leadingIcon = AppIcons.Phone
             )
 
             Spacer(modifier = Modifier.height(28.dp))

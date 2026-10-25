@@ -4,9 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,17 +41,17 @@ fun RegistrationStatusScreen(
             Tab(
                 selected = selectedStatusTab == 0,
                 onClick = { selectedStatusTab = 0 },
-                text = { Text("Pending", fontWeight = if (selectedStatusTab == 0) FontWeight.Bold else FontWeight.Medium) }
+                text = { Text("Pending", style = MaterialTheme.typography.labelLarge, fontWeight = if (selectedStatusTab == 0) FontWeight.Bold else FontWeight.Medium) }
             )
             Tab(
                 selected = selectedStatusTab == 1,
                 onClick = { selectedStatusTab = 1 },
-                text = { Text("Approved", fontWeight = if (selectedStatusTab == 1) FontWeight.Bold else FontWeight.Medium) }
+                text = { Text("Approved", style = MaterialTheme.typography.labelLarge, fontWeight = if (selectedStatusTab == 1) FontWeight.Bold else FontWeight.Medium) }
             )
             Tab(
                 selected = selectedStatusTab == 2,
                 onClick = { selectedStatusTab = 2 },
-                text = { Text("Rejected", fontWeight = if (selectedStatusTab == 2) FontWeight.Bold else FontWeight.Medium) }
+                text = { Text("Rejected", style = MaterialTheme.typography.labelLarge, fontWeight = if (selectedStatusTab == 2) FontWeight.Bold else FontWeight.Medium) }
             )
         }
 
@@ -81,7 +78,7 @@ fun RegistrationStatusScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.CheckCircle,
+                                imageVector = AppIcons.CheckCircle,
                                 contentDescription = "Pending",
                                 tint = WarningLight,
                                 modifier = Modifier.size(48.dp)
@@ -152,7 +149,7 @@ fun RegistrationStatusScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.CheckCircle,
+                                imageVector = AppIcons.CheckCircle,
                                 contentDescription = "Approved",
                                 tint = SuccessLight,
                                 modifier = Modifier.size(48.dp)
@@ -197,7 +194,7 @@ fun RegistrationStatusScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.Cancel,
+                                imageVector = AppIcons.Cancel,
                                 contentDescription = "Rejected",
                                 tint = ErrorLight,
                                 modifier = Modifier.size(48.dp)

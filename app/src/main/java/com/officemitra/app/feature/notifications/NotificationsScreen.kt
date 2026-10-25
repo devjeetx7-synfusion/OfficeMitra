@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
+import com.officemitra.app.core.theme.AppIcons
 
 @Composable
 fun NotificationsScreen(
@@ -41,11 +40,15 @@ fun NotificationsScreen(
             showBackButton = true,
             onBackClick = onBackClick,
             actions = {
-                IconButton(onClick = viewModel::markAllAsRead) {
+                IconButton(
+                    onClick = viewModel::markAllAsRead,
+                    modifier = Modifier.size(48.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Outlined.DoneAll,
+                        imageVector = AppIcons.DoneAll,
                         contentDescription = "Mark all as read",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -71,7 +74,10 @@ fun NotificationsScreen(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(onClick = { showClearConfirmDialog = true }) {
+                    TextButton(
+                        onClick = { showClearConfirmDialog = true },
+                        modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                    ) {
                         Text(
                             text = "Clear All",
                             style = MaterialTheme.typography.labelLarge,
