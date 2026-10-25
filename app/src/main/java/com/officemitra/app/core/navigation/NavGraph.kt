@@ -171,6 +171,7 @@ fun AppNavGraph(
                 onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onNavigateToAppSettings = { navController.navigate(Screen.AppSettings.route) },
                 onNavigateToAboutApp = { navController.navigate(Screen.AboutApp.route) },
+                onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
                 onLogout = {
                     navController.navigate(Screen.Welcome.route) {
                         popUpTo(0) { inclusive = true }

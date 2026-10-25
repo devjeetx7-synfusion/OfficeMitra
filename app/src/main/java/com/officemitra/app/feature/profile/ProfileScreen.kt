@@ -1,6 +1,5 @@
 package com.officemitra.app.feature.profile
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +23,7 @@ fun ProfileScreen(
     onNavigateToChangePassword: () -> Unit,
     onNavigateToAppSettings: () -> Unit,
     onNavigateToAboutApp: () -> Unit,
+    onNavigateToNotifications: () -> Unit = {},
     onLogout: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -35,7 +35,22 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        OfficeMitraTopBar(title = "My Profile")
+        OfficeMitraTopBar(
+            title = "Profile",
+            actions = {
+                IconButton(
+                    onClick = onNavigateToAppSettings,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = AppIcons.Settings,
+                        contentDescription = "Settings",
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+        )
 
         Column(
             modifier = Modifier
@@ -43,106 +58,150 @@ fun ProfileScreen(
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Midnight Ink Profile Header Card
-            ProfileHeader(
-                name = uiState.user.name,
-                employeeId = uiState.user.employeeId,
-                companyName = uiState.user.companyName,
-                department = uiState.user.department,
-                designation = uiState.user.designation,
-                imageUrl = uiState.user.avatarUrl,
-                onEditClick = onNavigateToEditProfile
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Personal Information
-            SectionHeader(
-                title = "Personal Information",
-                actionText = "Edit",
-                onActionClick = onNavigateToEditProfile
-            )
-
-            Surface(
+            // Instagram-inspired compact header: Avatar (64dp), name, designation, company
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    InfoRow(label = "Email Address", value = uiState.user.email, icon = AppIcons.Email)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                    InfoRow(label = "Mobile Number", value = uiState.user.phone, icon = AppIcons.Phone)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                    InfoRow(label = "Company Name", value = uiState.user.companyName, icon = AppIcons.Business)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                    InfoRow(label = "Joining Date", value = uiState.user.joiningDate, icon = AppIcons.Calendar)
+                EmployeeAvatar(
+                    imageUrl = uiState.user.avatarUrl,
+                    name = uiState.user.name,
+                    size = 64
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = uiState.user.name,
+                        style = MaterialTheme.typography.headlineMedium, // 21sp / 27sp
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "${uiState.user.designation} • ${uiState.user.department}",
+                        style = MaterialTheme.typography.titleSmall, // 14sp / 20sp
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = uiState.user.companyName,
+                        style = MaterialTheme.typography.bodySmall, // 12sp / 18sp
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Settings & Preferences
-            SectionHeader(title = "Account Settings")
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
+            // EXACTLY ONE primary Edit Profile entry point on the Profile screen
+            OutlinedButton(
+                onClick = onNavigateToEditProfile,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outline
+                ),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
-                Column(modifier = Modifier.padding(vertical = 4.dp)) {
-                    SettingOptionRow(
-                        title = "Edit Profile Info",
-                        icon = AppIcons.Profile,
-                        onClick = onNavigateToEditProfile
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    SettingOptionRow(
-                        title = "Change Password",
-                        icon = AppIcons.Lock,
-                        onClick = onNavigateToChangePassword
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    SettingOptionRow(
-                        title = "App Preferences & Theme",
-                        icon = AppIcons.Settings,
-                        onClick = onNavigateToAppSettings
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    SettingOptionRow(
-                        title = "About Office Mitra",
-                        icon = AppIcons.Info,
-                        onClick = onNavigateToAboutApp
-                    )
-                }
+                Text(
+                    text = "Edit Profile",
+                    style = MaterialTheme.typography.titleSmall, // 14sp / 20sp
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Logout Button
-            Button(
-                onClick = { showLogoutDialog = true },
+            // Personal Information
+            Text(
+                text = "Personal Information",
+                style = MaterialTheme.typography.titleLarge, // 17sp / 23sp
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                InfoRow(label = "Email Address", value = uiState.user.email, icon = AppIcons.Email)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                InfoRow(label = "Mobile Number", value = uiState.user.phone, icon = AppIcons.Phone)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                InfoRow(label = "Company Name", value = uiState.user.companyName, icon = AppIcons.Business)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                InfoRow(label = "Joining Date", value = uiState.user.joiningDate, icon = AppIcons.Calendar)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                InfoRow(label = "Employee ID", value = uiState.user.employeeId, icon = AppIcons.Badge)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Settings & Activity Section
+            Text(
+                text = "Settings & Activity",
+                style = MaterialTheme.typography.titleLarge, // 17sp / 23sp
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                SettingOptionRow(
+                    title = "Password and Security",
+                    icon = AppIcons.Lock,
+                    onClick = onNavigateToChangePassword
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                SettingOptionRow(
+                    title = "Notifications",
+                    icon = AppIcons.Notifications,
+                    onClick = onNavigateToNotifications
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                SettingOptionRow(
+                    title = "Appearance and Theme",
+                    icon = AppIcons.Settings,
+                    onClick = onNavigateToAppSettings
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                SettingOptionRow(
+                    title = "About Office Mitra",
+                    icon = AppIcons.Info,
+                    onClick = onNavigateToAboutApp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Minimal Log Out row
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
-                    contentColor = MaterialTheme.colorScheme.error
-                )
+                    .defaultMinSize(minHeight = 52.dp)
+                    .clickable { showLogoutDialog = true }
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = AppIcons.PunchOut,
-                        contentDescription = "Logout",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Log Out", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                }
+                Icon(
+                    imageVector = AppIcons.PunchOut,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(14.dp))
+                Text(
+                    text = "Log Out",
+                    style = MaterialTheme.typography.titleSmall, // 14sp / 20sp
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
 
             Spacer(modifier = Modifier.height(100.dp))
@@ -166,17 +225,33 @@ fun ProfileScreen(
 
 @Composable
 private fun InfoRow(label: String, value: String, icon: ImageVector) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 52.dp)
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp) // Settings & Info row icon: 20dp
+            modifier = Modifier.size(20.dp)
         )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Spacer(modifier = Modifier.width(14.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall, // 12-13sp / 18sp
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleSmall, // 14sp / 20sp
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
@@ -186,26 +261,35 @@ private fun SettingOptionRow(title: String, icon: ImageVector, onClick: () -> Un
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = 52.dp)
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(22.dp) // Settings options icon: 20-22dp
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(20.dp)
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(text = title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.width(14.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall, // 14sp / 20sp
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
         Icon(
             imageVector = AppIcons.ChevronRight,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(18.dp)
         )
     }
 }
