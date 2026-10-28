@@ -480,7 +480,7 @@ class SupabaseOfficeMitraRepository @Inject constructor(
                 employeeIdentifier = employeeId.ifBlank { "EMP-${System.currentTimeMillis() % 10000}" },
                 department = department.ifBlank { "General" },
                 jobTitle = designation.ifBlank { "Employee" },
-                status = "approved",
+                status = "pending",
                 role = "employee"
             )
 
@@ -543,10 +543,23 @@ class SupabaseOfficeMitraRepository @Inject constructor(
                 )
                 postgrest["attendance"].insert(record)
             } else {
+                val punchOut = getCurrentIsoTimestamp()
+                val currentRecord = postgrest["attendance"].select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("date", todayDate)
+                    }
+                }.decodeList<AttendanceDto>().firstOrNull()
+                    ?: return Result.failure(IllegalStateException("Today's attendance record was not found"))
+                val punchInMillis = parseIsoTimestamp(currentRecord.punchIn)
+                    ?: return Result.failure(IllegalStateException("Punch-in timestamp is invalid"))
+                val punchOutMillis = System.currentTimeMillis()
+                val totalMinutes = ((punchOutMillis - punchInMillis).coerceAtLeast(0L) / 60_000L)
+                val workingDuration = "${totalMinutes / 60}h ${totalMinutes % 60}m"
                 postgrest["attendance"].update(
                     mapOf(
-                        "punch_out" to getCurrentIsoTimestamp(),
-                        "working_duration" to "8h 30m"
+                        "punch_out" to punchOut,
+                        "working_duration" to workingDuration
                     )
                 ) {
                     filter {
@@ -600,9 +613,13 @@ class SupabaseOfficeMitraRepository @Inject constructor(
 
     override suspend fun cancelLeaveRequest(requestId: String): Result<Unit> {
         return try {
+            val userId = auth.currentUserOrNull()?.id
+                ?: return Result.failure(IllegalStateException("Not authenticated"))
             postgrest["leave_requests"].update(mapOf("status" to "Cancelled")) {
                 filter {
                     eq("id", requestId)
+                    eq("user_id", userId)
+                    eq("status", "Pending")
                 }
             }
             auth.currentUserOrNull()?.id?.let { loadLeaveRequests(it) }
@@ -706,7 +723,19 @@ class SupabaseOfficeMitraRepository @Inject constructor(
 
     private fun getCurrentIsoTimestamp(): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+        sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
         return sdf.format(Date())
+    }
+
+    private fun parseIsoTimestamp(value: String?): Long? {
+        if (value.isNullOrBlank()) return null
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            sdf.parse(value.take(19))?.time
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private fun getCurrentDateFormatted(): String {
