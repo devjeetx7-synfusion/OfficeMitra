@@ -2,9 +2,8 @@ package com.officemitra.app.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.officemitra.app.data.preferences.UserPreferences
+import com.officemitra.app.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +23,13 @@ data class RegisterUiState(
     val passwordError: String? = null,
     val confirmPasswordError: String? = null,
     val termsError: String? = null,
+    val errorMessage: String? = null,
     val isLoading: Boolean = false
 )
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -74,11 +74,22 @@ class RegisterViewModel @Inject constructor(
         if (hasError) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            delay(1000)
-            userPreferences.setLoggedIn(true)
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            val result = authRepository.signUp(
+                email = state.email.trim(),
+                pass = state.password,
+                fullName = state.fullName.trim(),
+                mobile = state.mobileNumber.trim()
+            )
             _uiState.value = _uiState.value.copy(isLoading = false)
-            onSuccess()
+            result.fold(
+                onSuccess = { onSuccess() },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = error.localizedMessage ?: "Registration failed. Please try again."
+                    )
+                }
+            )
         }
     }
 }

@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.model.User
 import com.officemitra.app.data.preferences.UserPreferences
-import com.officemitra.app.data.repository.DemoRepository
+import com.officemitra.app.data.repository.AuthRepository
+import com.officemitra.app.data.repository.OfficeMitraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -17,7 +18,8 @@ data class ProfileUiState(
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: DemoRepository,
+    private val repository: OfficeMitraRepository,
+    private val authRepository: AuthRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
@@ -33,7 +35,9 @@ class ProfileViewModel @Inject constructor(
     )
 
     fun updateProfile(name: String, email: String, phone: String) {
-        repository.updateProfile(name, email, phone)
+        viewModelScope.launch {
+            repository.updateProfile(name, email, phone)
+        }
     }
 
     fun setThemeMode(mode: String) {
@@ -44,7 +48,7 @@ class ProfileViewModel @Inject constructor(
 
     fun logout(onLoggedOut: () -> Unit) {
         viewModelScope.launch {
-            userPreferences.setLoggedIn(false)
+            authRepository.signOut()
             onLoggedOut()
         }
     }

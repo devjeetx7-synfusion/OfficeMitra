@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.model.LeaveBalance
 import com.officemitra.app.data.model.LeaveRequest
-import com.officemitra.app.data.repository.DemoRepository
+import com.officemitra.app.data.repository.OfficeMitraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class LeaveUiState(
@@ -16,7 +17,7 @@ data class LeaveUiState(
 
 @HiltViewModel
 class LeaveViewModel @Inject constructor(
-    private val repository: DemoRepository
+    private val repository: OfficeMitraRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<LeaveUiState> = combine(
@@ -31,10 +32,14 @@ class LeaveViewModel @Inject constructor(
     )
 
     fun applyLeave(leaveType: String, startDate: String, endDate: String, daysCount: Int, reason: String) {
-        repository.applyLeave(leaveType, startDate, endDate, daysCount, reason)
+        viewModelScope.launch {
+            repository.applyLeave(leaveType, startDate, endDate, daysCount, reason)
+        }
     }
 
     fun cancelLeave(requestId: String) {
-        repository.cancelLeaveRequest(requestId)
+        viewModelScope.launch {
+            repository.cancelLeaveRequest(requestId)
+        }
     }
 }

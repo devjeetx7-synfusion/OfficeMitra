@@ -3,9 +3,8 @@ package com.officemitra.app.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.model.*
-import com.officemitra.app.data.repository.DemoRepository
+import com.officemitra.app.data.repository.OfficeMitraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +20,7 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: DemoRepository
+    private val repository: OfficeMitraRepository
 ) : ViewModel() {
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -53,13 +52,15 @@ class HomeViewModel @Inject constructor(
     )
 
     fun togglePunchStatus() {
-        repository.togglePunchInStatus()
+        viewModelScope.launch {
+            repository.togglePunchInStatus()
+        }
     }
 
     fun refreshDashboard() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            delay(800)
+            repository.refreshAll()
             _isRefreshing.value = false
         }
     }

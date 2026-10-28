@@ -10,12 +10,14 @@ import androidx.compose.ui.unit.dp
 import com.officemitra.app.core.components.*
 import com.officemitra.app.core.theme.AppIcons
 
+import androidx.hilt.navigation.compose.hiltViewModel
+
 @Composable
 fun ForgotPasswordScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: ForgotPasswordViewModel = hiltViewModel()
 ) {
-    var email by remember { mutableStateOf("") }
-    var isSubmitted by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -52,12 +54,17 @@ fun ForgotPasswordScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                if (!isSubmitted) {
+                if (uiState.errorMessage != null) {
+                    InfoBanner(message = uiState.errorMessage ?: "")
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                if (!uiState.isSubmitted) {
                     FormTextField(
-                        value = email,
-                        onValueChange = { email = it },
+                        value = uiState.email,
+                        onValueChange = viewModel::onEmailChanged,
                         label = "Email Address",
-                        placeholder = "alex.morgan@officemitra.com",
+                        placeholder = "user@company.com",
                         leadingIcon = AppIcons.Email
                     )
 
@@ -65,15 +72,12 @@ fun ForgotPasswordScreen(
 
                     PrimaryButton(
                         text = "Send Reset Link",
-                        onClick = {
-                            if (email.isNotBlank()) {
-                                isSubmitted = true
-                            }
-                        }
+                        onClick = { viewModel.sendPasswordReset() },
+                        isLoading = uiState.isLoading
                     )
                 } else {
                     InfoBanner(
-                        message = "Demo Reset Link Sent! Check your email inbox for instructions."
+                        message = "Password reset link sent! Please check your email inbox."
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
