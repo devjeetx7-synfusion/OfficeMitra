@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.model.ApprovalRequest
 import com.officemitra.app.data.model.User
-import com.officemitra.app.data.repository.DemoRepository
+import com.officemitra.app.data.repository.OfficeMitraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ApprovalsUiState(
@@ -16,7 +17,7 @@ data class ApprovalsUiState(
 
 @HiltViewModel
 class ApprovalsViewModel @Inject constructor(
-    private val repository: DemoRepository
+    private val repository: OfficeMitraRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<ApprovalsUiState> = combine(
@@ -31,10 +32,12 @@ class ApprovalsViewModel @Inject constructor(
     )
 
     fun toggleApproverRole(isApprover: Boolean) {
-        repository.toggleAuthorizedApproverRole(isApprover)
+        // Role is managed via company membership role on Supabase
     }
 
     fun updateApprovalStatus(requestId: String, isApproved: Boolean, comment: String? = null) {
-        repository.updateApprovalStatus(requestId, isApproved, comment)
+        viewModelScope.launch {
+            repository.updateApprovalStatus(requestId, isApproved, comment)
+        }
     }
 }

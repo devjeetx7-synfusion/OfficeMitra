@@ -2,9 +2,8 @@ package com.officemitra.app.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.officemitra.app.data.preferences.UserPreferences
+import com.officemitra.app.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +22,7 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -61,11 +60,20 @@ class LoginViewModel @Inject constructor(
         if (hasError) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            delay(1000) // Simulate demo authentication
-            userPreferences.setLoggedIn(true)
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            val result = authRepository.signIn(
+                email = state.emailOrPhone.trim(),
+                pass = state.password
+            )
             _uiState.value = _uiState.value.copy(isLoading = false)
-            onSuccess()
+            result.fold(
+                onSuccess = { onSuccess() },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = error.localizedMessage ?: "Login failed. Please check your credentials."
+                    )
+                }
+            )
         }
     }
 }

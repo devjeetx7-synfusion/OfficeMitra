@@ -3,6 +3,7 @@ package com.officemitra.app.feature.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.preferences.UserPreferences
+import com.officemitra.app.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ sealed class SplashDestination {
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _destination = MutableStateFlow<SplashDestination?>(null)
@@ -32,13 +34,13 @@ class SplashViewModel @Inject constructor(
 
     private fun checkNavigationState() {
         viewModelScope.launch {
-            delay(2000) // Splash animation delay
+            delay(1500) // Splash animation delay
             val isOnboardingCompleted = userPreferences.isOnboardingCompleted.first()
-            val isLoggedIn = userPreferences.isLoggedIn.first()
+            val isSessionRestored = authRepository.restoreSession()
 
             _destination.value = when {
                 !isOnboardingCompleted -> SplashDestination.Onboarding
-                !isLoggedIn -> SplashDestination.Welcome
+                !isSessionRestored -> SplashDestination.Welcome
                 else -> SplashDestination.Home
             }
         }

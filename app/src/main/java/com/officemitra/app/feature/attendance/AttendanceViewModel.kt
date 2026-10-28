@@ -3,23 +3,24 @@ package com.officemitra.app.feature.attendance
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.model.AttendanceRecord
-import com.officemitra.app.data.repository.DemoRepository
+import com.officemitra.app.data.repository.OfficeMitraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class AttendanceUiState(
     val isPunchedIn: Boolean = false,
     val todayAttendance: AttendanceRecord,
     val historyRecords: List<AttendanceRecord> = emptyList(),
-    val locationStatus: String = "In Office Range (Geofence Verified)",
+    val locationStatus: String = "Office HQ",
     val isCameraCaptured: Boolean = false,
     val capturedPhotoPath: String? = null
 )
 
 @HiltViewModel
 class AttendanceViewModel @Inject constructor(
-    private val repository: DemoRepository
+    private val repository: OfficeMitraRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<AttendanceUiState> = combine(
@@ -41,10 +42,14 @@ class AttendanceViewModel @Inject constructor(
     )
 
     fun punchInOrOut() {
-        repository.togglePunchInStatus()
+        viewModelScope.launch {
+            repository.togglePunchInStatus()
+        }
     }
 
     fun submitCorrection(date: String, requestedTime: String, reason: String) {
-        repository.submitAttendanceCorrection(date, requestedTime, reason)
+        viewModelScope.launch {
+            repository.submitAttendanceCorrection(date, requestedTime, reason)
+        }
     }
 }
