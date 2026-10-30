@@ -5,9 +5,7 @@ import com.officemitra.app.data.remote.model.*
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,22 +31,7 @@ class SupabaseOfficeMitraRepository @Inject constructor(
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
-    private val _currentUser = MutableStateFlow(
-        User(
-            id = "",
-            name = "Employee",
-            email = "",
-            phone = "",
-            employeeId = "",
-            companyCode = "",
-            companyName = "No Company Joined",
-            department = "General",
-            designation = "Employee",
-            joiningDate = "N/A",
-            isAuthorizedApprover = false,
-            approvalStatus = ApprovalStatus.PENDING
-        )
-    )
+    private val _currentUser = MutableStateFlow(User())
     override val currentUser: StateFlow<User> = _currentUser.asStateFlow()
 
     private val _isPunchedIn = MutableStateFlow(false)
@@ -56,7 +39,6 @@ class SupabaseOfficeMitraRepository @Inject constructor(
 
     private val _todayAttendance = MutableStateFlow(
         AttendanceRecord(
-            id = "ATT-TODAY",
             date = getCurrentDateFormatted(),
             punchIn = "--:--",
             punchOut = "--:--",
@@ -96,7 +78,23 @@ class SupabaseOfficeMitraRepository @Inject constructor(
     }
 
     override suspend fun refreshAll() {
-        val userId = auth.currentUserOrNull()?.id ?: return
+        val authUser = auth.currentUserOrNull()
+        val userId = authUser?.id
+        if (userId == null) {
+            _currentUser.value = User()
+            _isPunchedIn.value = false
+            _todayAttendance.value = AttendanceRecord(date = getCurrentDateFormatted())
+            _attendanceHistory.value = emptyList()
+            _leaveBalance.value = LeaveBalance()
+            _leaveRequests.value = emptyList()
+            _approvalRequests.value = emptyList()
+            _holidays.value = emptyList()
+            _salarySlips.value = emptyList()
+            _notifications.value = emptyList()
+            activeCompanyId = null
+            return
+        }
+
         try {
             loadUserProfile()
             loadCompanyMembership(userId)
@@ -114,7 +112,9 @@ class SupabaseOfficeMitraRepository @Inject constructor(
     }
 
     override suspend fun loadUserProfile(): Result<User> {
-        val userId = auth.currentUserOrNull()?.id ?: return Result.failure(IllegalStateException("User not authenticated"))
+        val authUser = auth.currentUserOrNull() ?: return Result.failure(IllegalStateException("User not authenticated"))
+        val userId = authUser.id
+
         return try {
             val profiles = postgrest["profiles"].select {
                 filter {
@@ -122,12 +122,26 @@ class SupabaseOfficeMitraRepository @Inject constructor(
                 }
             }.decodeList<ProfileDto>()
 
-            val profile = profiles.firstOrNull() ?: return Result.failure(NoSuchElementException("Profile not found"))
+            var profile = profiles.firstOrNull()
+            if (profile == null) {
+                // Provision profile row if not present
+                val fullName = authUser.userMetadata?.get("full_name")?.toString()?.replace("\"", "")
+                    ?: authUser.email?.substringBefore("@") ?: "Employee"
+                val phone = authUser.userMetadata?.get("phone_number")?.toString()?.replace("\"", "") ?: ""
+                val newProfile = ProfileDto(
+                    id = userId,
+                    fullName = fullName,
+                    email = authUser.email,
+                    phoneNumber = phone
+                )
+                postgrest["profiles"].insert(newProfile)
+                profile = newProfile
+            }
 
-            var updatedUser = _currentUser.value.copy(
+            val updatedUser = _currentUser.value.copy(
                 id = profile.id,
                 name = profile.fullName,
-                email = profile.email ?: auth.currentUserOrNull()?.email ?: "",
+                email = profile.email ?: authUser.email ?: "",
                 phone = profile.phoneNumber ?: "",
                 avatarUrl = profile.avatarPath
             )
@@ -156,7 +170,7 @@ class SupabaseOfficeMitraRepository @Inject constructor(
                 }.decodeList<CompanyDto>()
 
                 val company = companies.firstOrNull()
-                val companyName = company?.name ?: "Office Mitra"
+                val companyName = company?.name ?: ""
                 val companyCode = company?.code ?: ""
 
                 val approvalStatus = when (membership.status.lowercase()) {
@@ -177,6 +191,20 @@ class SupabaseOfficeMitraRepository @Inject constructor(
                         joiningDate = membership.joiningDate ?: "N/A",
                         isAuthorizedApprover = isApprover,
                         approvalStatus = approvalStatus
+                    )
+                }
+            } else {
+                activeCompanyId = null
+                _currentUser.update {
+                    it.copy(
+                        employeeId = "",
+                        companyCode = "",
+                        companyName = "",
+                        department = "",
+                        designation = "",
+                        joiningDate = "",
+                        isAuthorizedApprover = false,
+                        approvalStatus = ApprovalStatus.PENDING
                     )
                 }
             }
@@ -212,7 +240,7 @@ class SupabaseOfficeMitraRepository @Inject constructor(
             } else {
                 _isPunchedIn.value = false
                 _todayAttendance.value = AttendanceRecord(
-                    id = "ATT-TODAY",
+                    id = "",
                     date = getCurrentDateFormatted(),
                     punchIn = "--:--",
                     punchOut = "--:--",
@@ -270,6 +298,8 @@ class SupabaseOfficeMitraRepository @Inject constructor(
                     earnedLeaveTotal = dto.earnedLeaveTotal,
                     earnedLeaveUsed = dto.earnedLeaveUsed
                 )
+            } else {
+                _leaveBalance.value = LeaveBalance()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -320,11 +350,32 @@ class SupabaseOfficeMitraRepository @Inject constructor(
             }.decodeList<ApprovalRequestDto>()
 
             val mapped = dtos.map { dto ->
+                var name = "Applicant"
+                var empId = ""
+                var dept = ""
+                try {
+                    val applicantProfiles = postgrest["profiles"].select {
+                        filter { eq("id", dto.userId) }
+                    }.decodeList<ProfileDto>()
+                    applicantProfiles.firstOrNull()?.let { p -> name = p.fullName }
+
+                    val applicantMemberships = postgrest["company_memberships"].select {
+                        filter {
+                            eq("company_id", companyId)
+                            eq("user_id", dto.userId)
+                        }
+                    }.decodeList<CompanyMembershipDto>()
+                    applicantMemberships.firstOrNull()?.let { m ->
+                        empId = m.employeeIdentifier
+                        dept = m.department
+                    }
+                } catch (_: Exception) {}
+
                 ApprovalRequest(
                     id = dto.id ?: "",
-                    employeeName = "Employee",
-                    employeeId = "EMP",
-                    department = "Department",
+                    employeeName = name,
+                    employeeId = empId,
+                    department = dept,
                     requestType = dto.requestType,
                     requestDate = formatIsoDateToDisplay(dto.requestDate),
                     details = dto.details,
@@ -440,10 +491,13 @@ class SupabaseOfficeMitraRepository @Inject constructor(
     }
 
     override suspend fun lookupCompanyByCode(companyCode: String): Result<CompanyInfo> {
+        val cleanCode = companyCode.trim()
+        if (cleanCode.isBlank()) return Result.failure(IllegalArgumentException("Company code cannot be empty"))
+
         return try {
             val companies = postgrest["companies"].select {
                 filter {
-                    eq("code", companyCode.trim())
+                    eq("code", cleanCode)
                 }
             }.decodeList<CompanyDto>()
 
@@ -509,7 +563,7 @@ class SupabaseOfficeMitraRepository @Inject constructor(
             val membership = CompanyMembershipDto(
                 companyId = companyDto.id,
                 userId = userId,
-                employeeIdentifier = "ADMIN-001",
+                employeeIdentifier = "ADMIN-${System.currentTimeMillis() % 1000}",
                 department = "Management",
                 jobTitle = "Company Owner / Admin",
                 status = "approved",
@@ -527,6 +581,10 @@ class SupabaseOfficeMitraRepository @Inject constructor(
     override suspend fun togglePunchInStatus(photoUrl: String?): Result<Unit> {
         val userId = auth.currentUserOrNull()?.id ?: return Result.failure(IllegalStateException("Not authenticated"))
         val companyId = activeCompanyId ?: return Result.failure(IllegalStateException("Please join a company first"))
+
+        if (_currentUser.value.approvalStatus != ApprovalStatus.APPROVED) {
+            return Result.failure(IllegalStateException("Your company membership is awaiting approval."))
+        }
 
         return try {
             val todayDate = getCurrentIsoDate()
@@ -581,6 +639,10 @@ class SupabaseOfficeMitraRepository @Inject constructor(
         val userId = auth.currentUserOrNull()?.id ?: return Result.failure(IllegalStateException("Not authenticated"))
         val companyId = activeCompanyId ?: return Result.failure(IllegalStateException("Please join a company first"))
 
+        if (_currentUser.value.approvalStatus != ApprovalStatus.APPROVED) {
+            return Result.failure(IllegalStateException("Your company membership is awaiting approval."))
+        }
+
         return try {
             val request = LeaveRequestDto(
                 companyId = companyId,
@@ -633,6 +695,10 @@ class SupabaseOfficeMitraRepository @Inject constructor(
         val userId = auth.currentUserOrNull()?.id ?: return Result.failure(IllegalStateException("Not authenticated"))
         val companyId = activeCompanyId ?: return Result.failure(IllegalStateException("Please join a company first"))
 
+        if (_currentUser.value.approvalStatus != ApprovalStatus.APPROVED) {
+            return Result.failure(IllegalStateException("Your company membership is awaiting approval."))
+        }
+
         return try {
             val approval = ApprovalRequestDto(
                 companyId = companyId,
@@ -651,6 +717,10 @@ class SupabaseOfficeMitraRepository @Inject constructor(
 
     override suspend fun updateApprovalStatus(requestId: String, isApproved: Boolean, comment: String?): Result<Unit> {
         val reviewerId = auth.currentUserOrNull()?.id
+        if (!_currentUser.value.isAuthorizedApprover) {
+            return Result.failure(IllegalStateException("Only authorized company managers/admins can review requests."))
+        }
+
         val newStatus = if (isApproved) "Approved" else "Rejected"
 
         return try {
@@ -792,6 +862,4 @@ class SupabaseOfficeMitraRepository @Inject constructor(
             "--:--"
         }
     }
-
-    private fun String?.isNull_or_blank(): Boolean = this == null || this.isBlank()
 }

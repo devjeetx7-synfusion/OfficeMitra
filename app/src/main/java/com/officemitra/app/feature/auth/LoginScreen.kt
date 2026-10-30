@@ -53,23 +53,22 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Log in using your registered email or mobile number.",
+                    text = "Log in using your registered email address.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                InfoBanner(
-                    message = "Demo Mode: Use any valid email & password to log in."
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
+                if (uiState.errorMessage != null) {
+                    InfoBanner(message = uiState.errorMessage ?: "")
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 FormTextField(
                     value = uiState.emailOrPhone,
                     onValueChange = viewModel::onEmailOrPhoneChanged,
-                    label = "Email or Mobile Number",
+                    label = "Email Address",
                     placeholder = "alex.morgan@officemitra.com",
                     leadingIcon = AppIcons.Email,
                     isError = uiState.emailError != null,

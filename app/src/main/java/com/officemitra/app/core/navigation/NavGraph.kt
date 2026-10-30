@@ -79,7 +79,7 @@ fun AppNavGraph(
                 onNavigateToLogin = { navController.navigate(Screen.Login.route) },
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onNavigateToJoinCompany = { navController.navigate(Screen.JoinCompany.route) },
-                onNavigateToTermsDemo = { navController.navigate(Screen.AboutApp.route) }
+                onNavigateToTerms = { navController.navigate(Screen.AboutApp.route) }
             )
         }
 

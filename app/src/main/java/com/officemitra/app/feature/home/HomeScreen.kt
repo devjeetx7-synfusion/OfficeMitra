@@ -202,16 +202,16 @@ fun HomeScreen(
             ) {
                 SummaryMetricCard(
                     title = "Present Days",
-                    value = "18 Days",
-                    subtitle = "On Track",
+                    value = "${uiState.presentDaysCount} Days",
+                    subtitle = if (uiState.presentDaysCount > 0) "Recorded" else "No Attendance",
                     icon = AppIcons.CheckCircle,
                     accentColor = SuccessLight,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryMetricCard(
                     title = "Leave Days",
-                    value = "2 Days",
-                    subtitle = "1 Pending",
+                    value = "${uiState.leaveDaysCount} Days",
+                    subtitle = if (uiState.pendingLeaveCount > 0) "${uiState.pendingLeaveCount} Pending" else "Up to date",
                     icon = AppIcons.Event,
                     accentColor = WarmCoral,
                     modifier = Modifier.weight(1f)

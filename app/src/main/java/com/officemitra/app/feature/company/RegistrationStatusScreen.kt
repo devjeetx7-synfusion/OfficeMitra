@@ -12,15 +12,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
 import com.officemitra.app.core.theme.*
+import com.officemitra.app.data.model.ApprovalStatus
 
 @Composable
 fun RegistrationStatusScreen(
     onNavigateToHome: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: RegistrationStatusViewModel = hiltViewModel()
 ) {
-    var selectedStatusTab by remember { mutableIntStateOf(0) } // 0: Pending, 1: Approved, 2: Rejected
+    val user by viewModel.currentUser.collectAsState()
 
     Column(
         modifier = Modifier
@@ -33,28 +36,6 @@ fun RegistrationStatusScreen(
             onBackClick = onBackClick
         )
 
-        // Demo State Switcher Tabs
-        TabRow(
-            selectedTabIndex = selectedStatusTab,
-            containerColor = MaterialTheme.colorScheme.surface
-        ) {
-            Tab(
-                selected = selectedStatusTab == 0,
-                onClick = { selectedStatusTab = 0 },
-                text = { Text("Pending", style = MaterialTheme.typography.labelLarge, fontWeight = if (selectedStatusTab == 0) FontWeight.Bold else FontWeight.Medium) }
-            )
-            Tab(
-                selected = selectedStatusTab == 1,
-                onClick = { selectedStatusTab = 1 },
-                text = { Text("Approved", style = MaterialTheme.typography.labelLarge, fontWeight = if (selectedStatusTab == 1) FontWeight.Bold else FontWeight.Medium) }
-            )
-            Tab(
-                selected = selectedStatusTab == 2,
-                onClick = { selectedStatusTab = 2 },
-                text = { Text("Rejected", style = MaterialTheme.typography.labelLarge, fontWeight = if (selectedStatusTab == 2) FontWeight.Bold else FontWeight.Medium) }
-            )
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -64,9 +45,8 @@ fun RegistrationStatusScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            when (selectedStatusTab) {
-                0 -> {
-                    // Pending State
+            when (user.approvalStatus) {
+                ApprovalStatus.PENDING -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -97,7 +77,10 @@ fun RegistrationStatusScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Your request to join Acme Technologies Corp (Code: OM-10245) is currently awaiting HR approval.",
+                            text = if (user.companyName.isNotBlank())
+                                "Your request to join ${user.companyName} (Code: ${user.companyCode}) is currently awaiting admin approval."
+                            else
+                                "Your company membership request is currently awaiting admin approval.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -119,25 +102,28 @@ fun RegistrationStatusScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
-                                Text(text = "Applicant: Alex Morgan", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                                Text(text = "Requested Date: Today", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                                Text(text = "Target Department: Software Engineering", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                                if (user.name.isNotBlank()) {
+                                    Text(text = "Applicant: ${user.name}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                                }
+                                if (user.department.isNotBlank()) {
+                                    Text(text = "Department: ${user.department}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                                }
+                                if (user.designation.isNotBlank()) {
+                                    Text(text = "Designation: ${user.designation}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                                }
                             }
                         }
                     }
 
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        InfoBanner(message = "Demo Note: You can switch tabs above to test Approved or Rejected states.")
-                        Spacer(modifier = Modifier.height(12.dp))
                         OutlineButton(
                             text = "Refresh Status",
-                            onClick = {}
+                            onClick = { viewModel.refreshStatus() }
                         )
                     }
                 }
 
-                1 -> {
-                    // Approved State
+                ApprovalStatus.APPROVED -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -168,7 +154,7 @@ fun RegistrationStatusScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Welcome aboard! Your request to join Acme Technologies Corp has been approved by HR.",
+                            text = "Welcome aboard! Your request to join ${user.companyName.ifBlank { "the company" }} has been approved.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -181,8 +167,7 @@ fun RegistrationStatusScreen(
                     )
                 }
 
-                2 -> {
-                    // Rejected State
+                ApprovalStatus.REJECTED -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -213,7 +198,7 @@ fun RegistrationStatusScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Your request to join Acme Technologies Corp could not be processed. Please verify your company code with your HR administrator.",
+                            text = "Your request to join ${user.companyName.ifBlank { "the company" }} could not be processed. Please verify your company code with your HR administrator.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center

@@ -3,6 +3,7 @@ package com.officemitra.app.feature.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.officemitra.app.data.repository.AuthRepository
+import com.officemitra.app.data.repository.SignUpResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,9 @@ data class RegisterUiState(
     val confirmPasswordError: String? = null,
     val termsError: String? = null,
     val errorMessage: String? = null,
-    val isLoading: Boolean = false
+    val infoMessage: String? = null,
+    val isLoading: Boolean = false,
+    val isVerificationRequired: Boolean = false
 )
 
 @HiltViewModel
@@ -35,12 +38,12 @@ class RegisterViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
-    fun onFullNameChanged(value: String) { _uiState.value = _uiState.value.copy(fullName = value, nameError = null) }
-    fun onEmailChanged(value: String) { _uiState.value = _uiState.value.copy(email = value, emailError = null) }
-    fun onMobileNumberChanged(value: String) { _uiState.value = _uiState.value.copy(mobileNumber = value, mobileError = null) }
-    fun onPasswordChanged(value: String) { _uiState.value = _uiState.value.copy(password = value, passwordError = null) }
-    fun onConfirmPasswordChanged(value: String) { _uiState.value = _uiState.value.copy(confirmPassword = value, confirmPasswordError = null) }
-    fun onAcceptTermsChanged(value: Boolean) { _uiState.value = _uiState.value.copy(acceptTerms = value, termsError = null) }
+    fun onFullNameChanged(value: String) { _uiState.value = _uiState.value.copy(fullName = value, nameError = null, errorMessage = null) }
+    fun onEmailChanged(value: String) { _uiState.value = _uiState.value.copy(email = value, emailError = null, errorMessage = null) }
+    fun onMobileNumberChanged(value: String) { _uiState.value = _uiState.value.copy(mobileNumber = value, mobileError = null, errorMessage = null) }
+    fun onPasswordChanged(value: String) { _uiState.value = _uiState.value.copy(password = value, passwordError = null, errorMessage = null) }
+    fun onConfirmPasswordChanged(value: String) { _uiState.value = _uiState.value.copy(confirmPassword = value, confirmPasswordError = null, errorMessage = null) }
+    fun onAcceptTermsChanged(value: Boolean) { _uiState.value = _uiState.value.copy(acceptTerms = value, termsError = null, errorMessage = null) }
 
     fun register(onSuccess: () -> Unit) {
         val state = _uiState.value
@@ -74,7 +77,7 @@ class RegisterViewModel @Inject constructor(
         if (hasError) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null, infoMessage = null)
             val result = authRepository.signUp(
                 email = state.email.trim(),
                 pass = state.password,
@@ -83,10 +86,22 @@ class RegisterViewModel @Inject constructor(
             )
             _uiState.value = _uiState.value.copy(isLoading = false)
             result.fold(
-                onSuccess = { onSuccess() },
+                onSuccess = { signUpResult ->
+                    when (signUpResult) {
+                        SignUpResult.Authenticated -> {
+                            onSuccess()
+                        }
+                        SignUpResult.VerificationRequired -> {
+                            _uiState.value = _uiState.value.copy(
+                                isVerificationRequired = true,
+                                infoMessage = "Account created successfully! Please check your email inbox to verify your account before logging in."
+                            )
+                        }
+                    }
+                },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
-                        errorMessage = error.localizedMessage ?: "Registration failed. Please try again."
+                        errorMessage = error.localizedMessage ?: "Registration failed. Please check your network and details."
                     )
                 }
             )

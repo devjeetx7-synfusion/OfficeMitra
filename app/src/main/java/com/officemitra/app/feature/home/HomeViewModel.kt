@@ -14,8 +14,18 @@ data class HomeUiState(
     val isPunchedIn: Boolean,
     val todayAttendance: AttendanceRecord,
     val unreadNotificationCount: Int,
+    val presentDaysCount: Int = 0,
+    val leaveDaysCount: Int = 0,
+    val pendingLeaveCount: Int = 0,
     val isRefreshing: Boolean = false,
     val recentActivities: List<AppNotification> = emptyList()
+)
+
+private data class HomeCoreState(
+    val user: User,
+    val isPunchedIn: Boolean,
+    val todayAttendance: AttendanceRecord,
+    val isRefreshing: Boolean
 )
 
 @HiltViewModel
@@ -25,19 +35,34 @@ class HomeViewModel @Inject constructor(
 
     private val _isRefreshing = MutableStateFlow(false)
 
-    val uiState: StateFlow<HomeUiState> = combine(
+    private val coreState: Flow<HomeCoreState> = combine(
         repository.currentUser,
         repository.isPunchedIn,
         repository.todayAttendance,
-        repository.notifications,
         _isRefreshing
-    ) { user, isPunchedIn, todayAttendance, notifications, isRefreshing ->
+    ) { user, isPunchedIn, todayAttendance, isRefreshing ->
+        HomeCoreState(user, isPunchedIn, todayAttendance, isRefreshing)
+    }
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        coreState,
+        repository.attendanceHistory,
+        repository.leaveRequests,
+        repository.notifications
+    ) { core, history, leaveRequests, notifications ->
+        val presentDays = history.count { it.status.equals("Present", ignoreCase = true) || (it.punchIn != "--:--" && it.punchIn.isNotBlank()) }
+        val leaveDays = leaveRequests.filter { it.status.equals("Approved", ignoreCase = true) }.sumOf { it.daysCount }
+        val pendingLeaves = leaveRequests.count { it.status.equals("Pending", ignoreCase = true) }
+
         HomeUiState(
-            user = user,
-            isPunchedIn = isPunchedIn,
-            todayAttendance = todayAttendance,
+            user = core.user,
+            isPunchedIn = core.isPunchedIn,
+            todayAttendance = core.todayAttendance,
             unreadNotificationCount = notifications.count { !it.isRead },
-            isRefreshing = isRefreshing,
+            presentDaysCount = presentDays,
+            leaveDaysCount = leaveDays,
+            pendingLeaveCount = pendingLeaves,
+            isRefreshing = core.isRefreshing,
             recentActivities = notifications.take(3)
         )
     }.stateIn(
