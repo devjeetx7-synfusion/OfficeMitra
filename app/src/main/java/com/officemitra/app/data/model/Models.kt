@@ -1,19 +1,19 @@
 package com.officemitra.app.data.model
 
 data class User(
-    val id: String,
-    val name: String,
-    val email: String,
-    val phone: String,
-    val employeeId: String,
-    val companyCode: String,
-    val companyName: String,
-    val department: String,
-    val designation: String,
+    val id: String = "",
+    val name: String = "",
+    val email: String = "",
+    val phone: String = "",
+    val employeeId: String = "",
+    val companyCode: String = "",
+    val companyName: String = "",
+    val department: String = "",
+    val designation: String = "",
     val avatarUrl: String? = null,
-    val joiningDate: String,
-    val isAuthorizedApprover: Boolean = true,
-    val approvalStatus: ApprovalStatus = ApprovalStatus.APPROVED
+    val joiningDate: String = "",
+    val isAuthorizedApprover: Boolean = false,
+    val approvalStatus: ApprovalStatus = ApprovalStatus.PENDING
 )
 
 enum class ApprovalStatus {
@@ -30,37 +30,37 @@ data class CompanyInfo(
 )
 
 data class AttendanceRecord(
-    val id: String,
-    val date: String,
-    val punchIn: String,
-    val punchOut: String,
-    val workingDuration: String,
-    val status: String, // "Present", "Absent", "Leave", "Half Day"
+    val id: String = "",
+    val date: String = "",
+    val punchIn: String = "--:--",
+    val punchOut: String = "--:--",
+    val workingDuration: String = "0h 0m",
+    val status: String = "Not Punched",
     val photoUrl: String? = null,
     val location: String = "Office HQ"
 )
 
 data class LeaveBalance(
-    val casualLeaveTotal: Int = 12,
-    val casualLeaveUsed: Int = 3,
-    val sickLeaveTotal: Int = 10,
-    val sickLeaveUsed: Int = 2,
-    val earnedLeaveTotal: Int = 15,
-    val earnedLeaveUsed: Int = 5
+    val casualLeaveTotal: Int = 0,
+    val casualLeaveUsed: Int = 0,
+    val sickLeaveTotal: Int = 0,
+    val sickLeaveUsed: Int = 0,
+    val earnedLeaveTotal: Int = 0,
+    val earnedLeaveUsed: Int = 0
 ) {
     val totalLeave: Int get() = casualLeaveTotal + sickLeaveTotal + earnedLeaveTotal
     val totalUsed: Int get() = casualLeaveUsed + sickLeaveUsed + earnedLeaveUsed
-    val totalRemaining: Int get() = totalLeave - totalUsed
+    val totalRemaining: Int get() = (totalLeave - totalUsed).coerceAtLeast(0)
 }
 
 data class LeaveRequest(
     val id: String,
-    val leaveType: String, // "Casual Leave", "Sick Leave", "Earned Leave"
+    val leaveType: String,
     val startDate: String,
     val endDate: String,
     val daysCount: Int,
     val reason: String,
-    val status: String, // "Pending", "Approved", "Rejected", "Cancelled"
+    val status: String,
     val appliedDate: String,
     val approverComment: String? = null
 )
@@ -70,10 +70,10 @@ data class ApprovalRequest(
     val employeeName: String,
     val employeeId: String,
     val department: String,
-    val requestType: String, // "Leave Request", "Attendance Correction", "Expense Claim"
+    val requestType: String,
     val requestDate: String,
     val details: String,
-    val status: String, // "Pending", "Approved", "Rejected"
+    val status: String,
     val decisionComment: String? = null
 )
 
@@ -95,7 +95,7 @@ data class SalarySlip(
     val publishDate: String,
     val basicSalary: String,
     val netSalary: String,
-    val pdfUrl: String = "sample_salary_slip.pdf"
+    val pdfUrl: String = ""
 )
 
 data class AppNotification(
@@ -103,7 +103,7 @@ data class AppNotification(
     val title: String,
     val message: String,
     val timestamp: String,
-    val category: String, // "Attendance", "Leave", "Salary Slip", "Company Updates", "Registration Status"
+    val category: String,
     val isRead: Boolean = false,
     val targetRoute: String? = null
 )

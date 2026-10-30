@@ -76,19 +76,13 @@ fun JoinCompanyScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            InfoBanner(
-                message = "Demo Code: Enter 'OM-10245' to preview Acme Tech Corp. Note: Company Code is for UI demo only and not proof of employment."
-            )
-
             Spacer(modifier = Modifier.height(20.dp))
 
             FormTextField(
                 value = uiState.companyCode,
                 onValueChange = viewModel::onCompanyCodeChanged,
                 label = "Company Code",
-                placeholder = "OM-10245",
+                placeholder = "e.g. OM-10245",
                 leadingIcon = AppIcons.QrCode,
                 isError = uiState.codeError != null,
                 errorMessage = uiState.codeError
@@ -105,7 +99,7 @@ fun JoinCompanyScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Company Preview Found",
+                            text = "Company Found",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
@@ -117,16 +111,13 @@ fun JoinCompanyScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Text(
-                            text = company.address,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "${company.totalEmployees} Employees",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (company.address.isNotBlank()) {
+                            Text(
+                                text = company.address,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -163,6 +154,7 @@ fun JoinCompanyScreen(
 
             PrimaryButton(
                 text = "Submit Join Request",
+                isLoading = uiState.isLoading,
                 onClick = { viewModel.submitJoinRequest(onNavigateToStatus) }
             )
         }

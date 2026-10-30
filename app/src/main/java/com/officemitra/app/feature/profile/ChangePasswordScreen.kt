@@ -7,17 +7,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
 
 @Composable
 fun ChangePasswordScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: ChangePasswordViewModel = hiltViewModel()
 ) {
-    var oldPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var errorMsg by remember { mutableStateOf<String?>(null) }
-    var isSuccess by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -44,44 +42,48 @@ fun ChangePasswordScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Enter your current password and set a new password.",
+                    text = "Set a new password for your account.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                PasswordTextField(value = oldPassword, onValueChange = { oldPassword = it }, label = "Current Password")
+                PasswordTextField(
+                    value = uiState.newPassword,
+                    onValueChange = viewModel::onNewPasswordChanged,
+                    label = "New Password"
+                )
                 Spacer(modifier = Modifier.height(14.dp))
-                PasswordTextField(value = newPassword, onValueChange = { newPassword = it }, label = "New Password")
-                Spacer(modifier = Modifier.height(14.dp))
-                PasswordTextField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = "Confirm New Password")
+                PasswordTextField(
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChanged,
+                    label = "Confirm New Password"
+                )
 
-                if (errorMsg != null) {
+                if (uiState.errorMessage != null) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = errorMsg!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = uiState.errorMessage ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
 
-                if (isSuccess) {
+                if (uiState.isSuccess) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    InfoBanner(message = "Password changed successfully! (Demo Mode)")
+                    InfoBanner(message = "Password changed successfully!")
                 }
             }
 
             PrimaryButton(
-                text = if (isSuccess) "Done" else "Update Password",
+                text = if (uiState.isSuccess) "Done" else "Update Password",
+                isLoading = uiState.isLoading,
                 onClick = {
-                    if (isSuccess) {
+                    if (uiState.isSuccess) {
                         onBackClick()
                     } else {
-                        if (oldPassword.isBlank() || newPassword.isBlank()) {
-                            errorMsg = "All fields are required"
-                        } else if (newPassword != confirmPassword) {
-                            errorMsg = "New passwords do not match"
-                        } else {
-                            errorMsg = null
-                            isSuccess = true
-                        }
+                        viewModel.updatePassword()
                     }
                 }
             )

@@ -1,15 +1,12 @@
 package com.officemitra.app.feature.approvals
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,50 +36,12 @@ fun ApprovalsScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         OfficeMitraTopBar(
-            title = "My Approvals",
+            title = "Company Approvals",
             showBackButton = true,
             onBackClick = onBackClick
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
-            // Approver Role Toggle Card
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Approver Role Mode",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = if (uiState.currentUser.isAuthorizedApprover) "Authorized Approver (Manager Role)" else "Standard Employee (View Only)",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = uiState.currentUser.isAuthorizedApprover,
-                        onCheckedChange = viewModel::toggleApproverRole,
-                        colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = MaterialTheme.colorScheme.surface
@@ -121,7 +80,12 @@ fun ApprovalsScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            if (filteredRequests.isEmpty()) {
+            if (!uiState.currentUser.isAuthorizedApprover) {
+                EmptyState(
+                    title = "View Only Access",
+                    description = "Only company managers and admins can review pending employee approval requests."
+                )
+            } else if (filteredRequests.isEmpty()) {
                 EmptyState(
                     title = "No $filterStatus Approvals",
                     description = "There are no approval requests under $filterStatus status."

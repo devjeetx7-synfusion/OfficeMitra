@@ -10,11 +10,17 @@ import kotlinx.serialization.json.put
 import javax.inject.Inject
 import javax.inject.Singleton
 
+sealed class SignUpResult {
+    object Authenticated : SignUpResult()
+    object VerificationRequired : SignUpResult()
+}
+
 interface AuthRepository {
-    suspend fun signUp(email: String, pass: String, fullName: String, mobile: String): Result<Unit>
+    suspend fun signUp(email: String, pass: String, fullName: String, mobile: String): Result<SignUpResult>
     suspend fun signIn(email: String, pass: String): Result<Unit>
     suspend fun signOut(): Result<Unit>
     suspend fun sendPasswordReset(email: String): Result<Unit>
+    suspend fun updatePassword(newPassword: String): Result<Unit>
     suspend fun restoreSession(): Boolean
     fun getCurrentUserId(): String?
 }
@@ -27,7 +33,7 @@ class SupabaseAuthRepository @Inject constructor(
 
     private val auth: Auth get() = supabaseClient.pluginManager.getPlugin(Auth)
 
-    override suspend fun signUp(email: String, pass: String, fullName: String, mobile: String): Result<Unit> {
+    override suspend fun signUp(email: String, pass: String, fullName: String, mobile: String): Result<SignUpResult> {
         return try {
             auth.signUpWith(Email) {
                 this.email = email
@@ -37,8 +43,14 @@ class SupabaseAuthRepository @Inject constructor(
                     put("phone_number", mobile)
                 }
             }
-            userPreferences.setLoggedIn(true)
-            Result.success(Unit)
+            val user = auth.currentUserOrNull()
+            if (user != null) {
+                userPreferences.setLoggedIn(true)
+                Result.success(SignUpResult.Authenticated)
+            } else {
+                userPreferences.setLoggedIn(false)
+                Result.success(SignUpResult.VerificationRequired)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -50,8 +62,14 @@ class SupabaseAuthRepository @Inject constructor(
                 this.email = email
                 this.password = pass
             }
-            userPreferences.setLoggedIn(true)
-            Result.success(Unit)
+            val user = auth.currentUserOrNull()
+            if (user != null) {
+                userPreferences.setLoggedIn(true)
+                Result.success(Unit)
+            } else {
+                userPreferences.setLoggedIn(false)
+                Result.failure(IllegalStateException("Login failed: User session not established."))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -63,7 +81,6 @@ class SupabaseAuthRepository @Inject constructor(
             userPreferences.setLoggedIn(false)
             Result.success(Unit)
         } catch (e: Exception) {
-            // Even if network call fails, clear local preference login status
             userPreferences.setLoggedIn(false)
             Result.failure(e)
         }
@@ -72,6 +89,17 @@ class SupabaseAuthRepository @Inject constructor(
     override suspend fun sendPasswordReset(email: String): Result<Unit> {
         return try {
             auth.resetPasswordForEmail(email)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updatePassword(newPassword: String): Result<Unit> {
+        return try {
+            auth.modifyUser {
+                password = newPassword
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

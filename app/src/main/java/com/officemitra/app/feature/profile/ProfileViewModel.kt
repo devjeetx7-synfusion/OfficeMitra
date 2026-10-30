@@ -49,6 +49,7 @@ class ProfileViewModel @Inject constructor(
     fun logout(onLoggedOut: () -> Unit) {
         viewModelScope.launch {
             authRepository.signOut()
+            repository.refreshAll()
             onLoggedOut()
         }
     }

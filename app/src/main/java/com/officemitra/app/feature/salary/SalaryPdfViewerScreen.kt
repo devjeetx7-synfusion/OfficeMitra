@@ -26,6 +26,7 @@ fun SalaryPdfViewerScreen(
     viewModel: SalaryViewModel = hiltViewModel()
 ) {
     val slips by viewModel.salarySlips.collectAsState()
+    val user by viewModel.currentUser.collectAsState()
     val slip = slips.find { it.id == salaryId } ?: slips.firstOrNull()
 
     Column(
@@ -91,20 +92,20 @@ fun SalaryPdfViewerScreen(
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "ACME TECHNOLOGIES CORP",
+                            text = user.companyName.ifBlank { "OFFICE MITRA" }.uppercase(),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "PAYSLIP FOR ${slip?.monthYear?.uppercase() ?: "APRIL 2025"}",
+                            text = "PAYSLIP FOR ${slip?.monthYear?.uppercase() ?: "STATEMENT"}",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    // Sample Breakdown Card
+                    // Breakdown Card
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -112,18 +113,20 @@ fun SalaryPdfViewerScreen(
                             .padding(16.dp)
                     ) {
                         Text(
-                            text = "Employee: Alex Morgan (OM-EMP-2025)",
+                            text = "Employee: ${user.name.ifBlank { "Employee" }} (${user.employeeId.ifBlank { "N/A" }})",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
+                        if (user.designation.isNotBlank()) {
+                            Text(
+                                text = "Designation: ${user.designation}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                         Text(
-                            text = "Designation: Senior Android Developer",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "Pay Period: ${slip?.period ?: "01 Apr - 30 Apr 2025"}",
+                            text = "Pay Period: ${slip?.period ?: "N/A"}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -132,24 +135,14 @@ fun SalaryPdfViewerScreen(
 
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(text = "Basic Salary:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                            Text(text = slip?.basicSalary ?: "$4,500.00", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(text = "House Rent Allowance:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                            Text(text = "$800.00", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(text = "Tax Deductions:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                            Text(text = "-$1,380.00", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
+                            Text(text = slip?.basicSalary ?: "$0.00", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         }
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(text = "NET PAYABLE:", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text(text = slip?.netSalary ?: "$3,920.00", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Text(text = slip?.netSalary ?: "$0.00", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         }
                     }
 

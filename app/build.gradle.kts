@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,22 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
+val supabaseUrl = (project.findProperty("SUPABASE_URL") as String?)
+    ?: localProperties.getProperty("SUPABASE_URL")
+    ?: System.getenv("SUPABASE_URL")
+    ?: "https://pznasehldwiyunfqydcu.supabase.co"
+
+val supabasePublishableKey = (project.findProperty("SUPABASE_PUBLISHABLE_KEY") as String?)
+    ?: localProperties.getProperty("SUPABASE_PUBLISHABLE_KEY")
+    ?: System.getenv("SUPABASE_PUBLISHABLE_KEY")
+    ?: "sb_publishable_-jn0-Cf7Oq9OCuxKVLHDhg_uxS5t6oU"
 
 android {
     namespace = "com.officemitra.app"
@@ -22,16 +40,25 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "https://pznasehldwiyunfqydcu.supabase.co"}\"")
-        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"${project.findProperty("SUPABASE_PUBLISHABLE_KEY") ?: "sb_publishable_-jn0-Cf7Oq9OCuxKVLHDhg_uxS5t6oU"}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${supabaseUrl.trim()}\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"${supabasePublishableKey.trim()}\"")
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file(project.findProperty("KEYSTORE_FILE") as String? ?: "${rootProject.projectDir}/test-keystore.jks")
-            storePassword = project.findProperty("KEYSTORE_PASSWORD") as String? ?: "android"
-            keyAlias = project.findProperty("KEY_ALIAS") as String? ?: "testkey"
-            keyPassword = project.findProperty("KEY_PASSWORD") as String? ?: "android"
+            val ksFile = (project.findProperty("KEYSTORE_FILE") as String?)
+                ?: localProperties.getProperty("KEYSTORE_FILE")
+                ?: "${rootProject.projectDir}/test-keystore.jks"
+            storeFile = file(ksFile)
+            storePassword = (project.findProperty("KEYSTORE_PASSWORD") as String?)
+                ?: localProperties.getProperty("KEYSTORE_PASSWORD")
+                ?: "android"
+            keyAlias = (project.findProperty("KEY_ALIAS") as String?)
+                ?: localProperties.getProperty("KEY_ALIAS")
+                ?: "testkey"
+            keyPassword = (project.findProperty("KEY_PASSWORD") as String?)
+                ?: localProperties.getProperty("KEY_PASSWORD")
+                ?: "android"
         }
     }
 

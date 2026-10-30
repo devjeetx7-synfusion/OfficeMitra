@@ -25,7 +25,7 @@ fun SalarySlipsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-    ) {
+        ) {
         OfficeMitraTopBar(
             title = "Salary Slips",
             showBackButton = true,
@@ -33,12 +33,6 @@ fun SalarySlipsScreen(
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
-            InfoBanner(
-                message = "Demo Document Repository: Bundled sample salary slips for preview."
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
             FilterChipRow(
                 options = listOf("2025", "2024"),
                 selectedOption = selectedYear,
@@ -47,17 +41,24 @@ fun SalarySlipsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(salarySlips) { slip ->
-                    SalarySlipCard(
-                        monthYear = slip.monthYear,
-                        period = slip.period,
-                        publishDate = slip.publishDate,
-                        onViewPdf = { onNavigateToPdfViewer(slip.id) },
-                        onDownloadPdf = { downloadMessage = "Downloading sample PDF for ${slip.monthYear}..." }
-                    )
+            if (salarySlips.isEmpty()) {
+                EmptyState(
+                    title = "No Salary Slips",
+                    description = "No published salary slips found for your account."
+                )
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(salarySlips) { slip ->
+                        SalarySlipCard(
+                            monthYear = slip.monthYear,
+                            period = slip.period,
+                            publishDate = slip.publishDate,
+                            onViewPdf = { onNavigateToPdfViewer(slip.id) },
+                            onDownloadPdf = { downloadMessage = "Downloading PDF for ${slip.monthYear}..." }
+                        )
+                    }
                 }
             }
         }

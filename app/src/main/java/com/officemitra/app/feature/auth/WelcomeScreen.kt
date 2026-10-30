@@ -23,7 +23,7 @@ fun WelcomeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToJoinCompany: () -> Unit,
-    onNavigateToTermsDemo: () -> Unit
+    onNavigateToTerms: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -100,11 +100,11 @@ fun WelcomeScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             TextButton(
-                onClick = onNavigateToTermsDemo,
+                onClick = onNavigateToTerms,
                 modifier = Modifier.defaultMinSize(minHeight = 48.dp)
             ) {
                 Text(
-                    text = "Privacy Policy & Terms of Service (Demo Links)",
+                    text = "Privacy Policy & Terms of Service",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

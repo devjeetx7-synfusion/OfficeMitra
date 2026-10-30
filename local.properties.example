@@ -1,0 +1,14 @@
+# Office Mitra - Local Properties Configuration Example
+# Copy this file to local.properties and set your configuration properties.
+
+sdk.dir=/opt/android-sdk
+
+# Supabase Credentials (Read from local.properties, gradle property -P, or System ENV)
+SUPABASE_URL=https://your-supabase-project.supabase.co
+SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-anon-key
+
+# Release Signing Properties (Optional)
+KEYSTORE_FILE=
+KEYSTORE_PASSWORD=
+KEY_ALIAS=
+KEY_PASSWORD=
