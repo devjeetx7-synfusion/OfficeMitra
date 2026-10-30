@@ -30,95 +30,83 @@ class SupabaseAuthRepository @Inject constructor(
     private val supabaseClient: SupabaseClient,
     private val userPreferences: UserPreferences
 ) : AuthRepository {
-
     private val auth: Auth get() = supabaseClient.pluginManager.getPlugin(Auth)
 
-    override suspend fun signUp(email: String, pass: String, fullName: String, mobile: String): Result<SignUpResult> {
-        return try {
-            auth.signUpWith(Email) {
-                this.email = email
-                this.password = pass
-                data = buildJsonObject {
-                    put("full_name", fullName)
-                    put("phone_number", mobile)
-                }
-            }
-            val user = auth.currentUserOrNull()
-            if (user != null) {
-                userPreferences.setLoggedIn(true)
-                Result.success(SignUpResult.Authenticated)
-            } else {
-                userPreferences.setLoggedIn(false)
-                Result.success(SignUpResult.VerificationRequired)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    private fun normalizedEmail(value: String): String {
+        val email = value.trim()
+        require(email.isNotEmpty()) { "Email address is required." }
+        require(!email.any { it.isWhitespace() }) { "Email address must not contain spaces." }
+        require(EMAIL_PATTERN.matches(email)) { "Enter a valid email address." }
+        return email
     }
 
-    override suspend fun signIn(email: String, pass: String): Result<Unit> {
-        return try {
-            auth.signInWith(Email) {
-                this.email = email
-                this.password = pass
+    override suspend fun signUp(email: String, pass: String, fullName: String, mobile: String): Result<SignUpResult> = try {
+        val cleanEmail = normalizedEmail(email)
+        require(pass.length >= 6) { "Password must contain at least 6 characters." }
+        auth.signUpWith(Email) {
+            this.email = cleanEmail
+            this.password = pass
+            data = buildJsonObject {
+                put("full_name", fullName.trim())
+                put("phone_number", mobile.trim())
             }
-            val user = auth.currentUserOrNull()
-            if (user != null) {
-                userPreferences.setLoggedIn(true)
-                Result.success(Unit)
-            } else {
-                userPreferences.setLoggedIn(false)
-                Result.failure(IllegalStateException("Login failed: User session not established."))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
-
-    override suspend fun signOut(): Result<Unit> {
-        return try {
-            auth.signOut()
+        if (auth.currentUserOrNull() != null) {
+            userPreferences.setLoggedIn(true)
+            Result.success(SignUpResult.Authenticated)
+        } else {
             userPreferences.setLoggedIn(false)
+            Result.success(SignUpResult.VerificationRequired)
+        }
+    } catch (e: Exception) { Result.failure(e) }
+
+    override suspend fun signIn(email: String, pass: String): Result<Unit> = try {
+        auth.signInWith(Email) {
+            this.email = normalizedEmail(email)
+            this.password = pass
+        }
+        if (auth.currentUserOrNull() != null) {
+            userPreferences.setLoggedIn(true)
             Result.success(Unit)
-        } catch (e: Exception) {
+        } else {
             userPreferences.setLoggedIn(false)
-            Result.failure(e)
+            Result.failure(IllegalStateException("Login failed: User session not established."))
         }
+    } catch (e: Exception) { Result.failure(e) }
+
+    override suspend fun signOut(): Result<Unit> = try {
+        auth.signOut()
+        userPreferences.setLoggedIn(false)
+        Result.success(Unit)
+    } catch (e: Exception) {
+        userPreferences.setLoggedIn(false)
+        Result.failure(e)
     }
 
-    override suspend fun sendPasswordReset(email: String): Result<Unit> {
-        return try {
-            auth.resetPasswordForEmail(email)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    override suspend fun sendPasswordReset(email: String): Result<Unit> = try {
+        auth.resetPasswordForEmail(normalizedEmail(email))
+        Result.success(Unit)
+    } catch (e: Exception) { Result.failure(e) }
+
+    override suspend fun updatePassword(newPassword: String): Result<Unit> = try {
+        require(newPassword.length >= 6) { "Password must contain at least 6 characters." }
+        auth.modifyUser { password = newPassword }
+        Result.success(Unit)
+    } catch (e: Exception) { Result.failure(e) }
+
+    override suspend fun restoreSession(): Boolean = try {
+        val user: UserInfo? = auth.currentUserOrNull()
+        val authenticated = user != null
+        userPreferences.setLoggedIn(authenticated)
+        authenticated
+    } catch (e: Exception) {
+        userPreferences.setLoggedIn(false)
+        false
     }
 
-    override suspend fun updatePassword(newPassword: String): Result<Unit> {
-        return try {
-            auth.modifyUser {
-                password = newPassword
-            }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+    override fun getCurrentUserId(): String? = auth.currentUserOrNull()?.id
 
-    override suspend fun restoreSession(): Boolean {
-        return try {
-            val user: UserInfo? = auth.currentUserOrNull()
-            val hasValidUser = user != null
-            userPreferences.setLoggedIn(hasValidUser)
-            hasValidUser
-        } catch (e: Exception) {
-            userPreferences.setLoggedIn(false)
-            false
-        }
-    }
-
-    override fun getCurrentUserId(): String? {
-        return auth.currentUserOrNull()?.id
+    private companion object {
+        val EMAIL_PATTERN = Regex("^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$")
     }
 }
