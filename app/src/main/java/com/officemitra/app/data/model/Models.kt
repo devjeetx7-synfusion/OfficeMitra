@@ -107,3 +107,35 @@ data class AppNotification(
     val isRead: Boolean = false,
     val targetRoute: String? = null
 )
+
+/** Where the signed-in user stands with regard to a company. Decides which screen they may enter. */
+enum class MembershipState {
+    /** The membership could not be loaded, so nothing may be assumed. */
+    UNKNOWN,
+    NONE,
+    PENDING,
+    APPROVED,
+    REJECTED;
+
+    companion object {
+        /** Picks the state to act on from the `status` column of every membership row of a user. */
+        fun fromStatuses(statuses: List<String>): MembershipState {
+            val normalized = statuses.map { it.trim().lowercase() }
+            return when {
+                normalized.isEmpty() -> NONE
+                "approved" in normalized -> APPROVED
+                "pending" in normalized -> PENDING
+                else -> REJECTED
+            }
+        }
+    }
+}
+
+enum class AccountLoadError { NONE, NETWORK, OTHER }
+
+/** Result of the last attempt to load the signed-in user's account from the server. */
+data class AccountState(
+    val membership: MembershipState = MembershipState.UNKNOWN,
+    val isSuspended: Boolean = false,
+    val loadError: AccountLoadError = AccountLoadError.NONE
+)

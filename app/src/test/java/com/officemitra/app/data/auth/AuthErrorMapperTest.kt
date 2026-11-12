@@ -153,4 +153,46 @@ class AuthErrorMapperTest {
             AuthErrorMapper.userMessage(IllegalStateException("x"), AuthAction.SIGN_UP)
         )
     }
+
+    @Test
+    fun `database permission and duplicate errors are recognised`() {
+        assertEquals(
+            AuthErrorType.FORBIDDEN,
+            classify("new row violates row-level security policy for table \"company_memberships\"")
+        )
+        assertEquals(AuthErrorType.FORBIDDEN, classify("permission denied for table profiles"))
+        assertEquals(
+            AuthErrorType.CONFLICT,
+            classify("duplicate key value violates unique constraint \"unique_company_user\"")
+        )
+        assertEquals(AuthErrorType.SESSION_EXPIRED, classify("JWT expired"))
+    }
+
+    @Test
+    fun `data layer failures are made safe but app authored messages are kept`() {
+        val leaky = IOException("Headers: [Authorization=[Bearer secret]]")
+        val safe = AuthErrorMapper.toSafeException(leaky)
+        assertFalse(safe.message.contains("Bearer"))
+        assertEquals(AuthErrorType.NETWORK, safe.type)
+
+        val own = AuthErrorMapper.appError("Please join a company first")
+        assertSame(own, AuthErrorMapper.toSafeException(own))
+        assertEquals("Please join a company first", AuthErrorMapper.userMessage(own, AuthAction.DATA))
+
+        // Exceptions thrown by libraries are never shown as they are, whatever their type.
+        val library = IllegalStateException("Fail to serialize body. Content has type: class X")
+        assertFalse(AuthErrorMapper.toSafeException(library).message.contains("serialize"))
+
+        val decoding = SerializationException("Unexpected JSON token at offset 0: {\"secret\":1}")
+        val safeDecoding = AuthErrorMapper.toSafeException(decoding)
+        assertEquals(AuthErrorType.SERVER, safeDecoding.type)
+        assertFalse(safeDecoding.message.contains("secret"))
+    }
+
+    @Test
+    fun `an action without a session reports an expired session`() {
+        val error = AuthErrorMapper.notSignedIn()
+        assertEquals(AuthErrorType.SESSION_EXPIRED, error.type)
+        assertTrue(error.message.isNotBlank())
+    }
 }

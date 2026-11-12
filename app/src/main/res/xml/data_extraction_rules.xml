@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12 and higher. The Supabase session (access and refresh token) is kept in shared
+     preferences and must never be copied to cloud backup or to another device. -->
 <data-extraction-rules>
     <cloud-backup>
-        <include domain="sharedpref" path="."/>
+        <exclude domain="sharedpref" path="." />
     </cloud-backup>
     <device-transfer>
-        <include domain="sharedpref" path="."/>
+        <exclude domain="sharedpref" path="." />
     </device-transfer>
 </data-extraction-rules>

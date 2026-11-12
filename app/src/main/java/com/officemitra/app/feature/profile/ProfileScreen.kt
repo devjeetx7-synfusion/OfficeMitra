@@ -28,6 +28,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val logoutState by viewModel.logoutState.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -185,7 +186,7 @@ fun ProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 52.dp)
-                    .clickable { showLogoutDialog = true }
+                    .clickable(enabled = !logoutState.isLoggingOut) { showLogoutDialog = true }
                     .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -215,10 +216,22 @@ fun ProfileScreen(
             confirmText = "Log Out",
             onConfirm = {
                 showLogoutDialog = false
-                viewModel.logout(onLogout)
+                // Navigation away from the app follows from the session ending (route guard).
+                viewModel.logout()
             },
             onDismiss = { showLogoutDialog = false },
             isDanger = true
+        )
+    }
+
+    logoutState.errorMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissLogoutError,
+            confirmButton = {
+                TextButton(onClick = viewModel::dismissLogoutError) { Text("OK") }
+            },
+            title = { Text("Log Out") },
+            text = { Text(message) }
         )
     }
 }

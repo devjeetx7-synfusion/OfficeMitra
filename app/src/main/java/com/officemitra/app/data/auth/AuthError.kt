@@ -18,7 +18,8 @@ enum class AuthAction {
     RESEND_CONFIRMATION,
     UPDATE_PASSWORD,
     AUTH_LINK,
-    PROFILE
+    PROFILE,
+    DATA
 }
 
 enum class AuthErrorType {
@@ -35,6 +36,8 @@ enum class AuthErrorType {
     SESSION_EXPIRED,
     REAUTHENTICATION_REQUIRED,
     LINK_INVALID,
+    FORBIDDEN,
+    CONFLICT,
     NETWORK,
     TIMEOUT,
     CONFIGURATION,
@@ -126,6 +129,8 @@ object AuthErrorMapper {
             ) -> AuthErrorType.SESSION_EXPIRED
             has("unable to validate email address", "email_address_invalid", "invalid format") ||
                 ("email address" in text && "invalid" in text) -> AuthErrorType.INVALID_EMAIL
+            has("row-level security", "permission denied", "insufficient_privilege") -> AuthErrorType.FORBIDDEN
+            has("duplicate key value", "already exists") -> AuthErrorType.CONFLICT
             has("database error", "unexpected_failure", "captcha") -> AuthErrorType.SERVER
             isUnauthorized -> AuthErrorType.SESSION_EXPIRED
             else -> AuthErrorType.UNKNOWN
@@ -153,6 +158,8 @@ object AuthErrorMapper {
             "For your security, please log out and log in again before changing your password."
         AuthErrorType.LINK_INVALID ->
             "This link is invalid or has expired. Please request a new one from the app on this device."
+        AuthErrorType.FORBIDDEN -> "You don't have permission to do that."
+        AuthErrorType.CONFLICT -> "That has already been submitted."
         AuthErrorType.NETWORK -> "Can't reach Office Mitra. Check your internet connection and try again."
         AuthErrorType.TIMEOUT -> "The request timed out. Check your connection and try again."
         AuthErrorType.CONFIGURATION ->
@@ -167,9 +174,28 @@ object AuthErrorMapper {
             AuthAction.UPDATE_PASSWORD -> "We couldn't update your password. Please try again."
             AuthAction.AUTH_LINK -> "We couldn't complete that link. Please try again."
             AuthAction.PROFILE -> "We couldn't save your profile. Please try again."
+            AuthAction.DATA -> "Something went wrong. Please try again."
         }
     }
 
     /** Message for any throwable shown outside the auth repository (for example profile saves). */
     fun userMessage(error: Throwable, action: AuthAction): String = map(error, action).message
+
+    /**
+     * Makes a failure from the data layer safe to show and to log.
+     *
+     * Only an [AuthException] is passed through, because only the app creates those and their
+     * message is written for the user. Every other exception is replaced: transport and server
+     * exceptions contain the request URL and headers, and exceptions thrown by libraries carry
+     * technical text.
+     */
+    fun toSafeException(error: Throwable, action: AuthAction = AuthAction.DATA): AuthException = map(error, action)
+
+    /** A failure raised by the app itself, with a message written for the user. */
+    fun appError(message: String, type: AuthErrorType = AuthErrorType.VALIDATION): AuthException =
+        AuthException(type, message)
+
+    /** The failure for an action that needs a signed-in user when there is none. */
+    fun notSignedIn(): AuthException =
+        AuthException(AuthErrorType.SESSION_EXPIRED, messageFor(AuthErrorType.SESSION_EXPIRED, AuthAction.DATA))
 }

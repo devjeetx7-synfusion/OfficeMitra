@@ -21,14 +21,29 @@
         android:theme="@style/Theme.OfficeMitra"
         tools:targetApi="31">
 
+        <!-- singleTask: an email link re-uses the running activity (onNewIntent) instead of
+             stacking a second copy of the app on top of the browser. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.OfficeMitra"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Supabase Auth redirects here after an email confirmation or password-reset link.
+                 Must match AuthDeepLink and the Redirect URLs configured in the Supabase dashboard:
+                 officemitra://auth-callback/confirm and officemitra://auth-callback/recovery -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="auth-callback"
+                    android:scheme="officemitra" />
             </intent-filter>
         </activity>
     </application>

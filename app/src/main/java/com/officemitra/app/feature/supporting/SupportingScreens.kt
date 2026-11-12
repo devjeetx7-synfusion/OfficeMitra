@@ -11,7 +11,8 @@ import com.officemitra.app.core.theme.AppIcons
 @Composable
 fun NoInternetScreen(
     onRetryClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isRetrying: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -23,27 +24,31 @@ fun NoInternetScreen(
             title = "No Internet Connection",
             description = "Please check your Wi-Fi or mobile data connection and try again.",
             icon = AppIcons.WifiOff,
-            actionLabel = "Retry Connection",
-            onActionClick = onRetryClick
+            actionLabel = if (isRetrying) "Checking Connection..." else "Retry Connection",
+            onActionClick = { if (!isRetrying) onRetryClick() }
         )
     }
 }
 
 @Composable
 fun AccessDeniedScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    title: String = "Access Denied",
+    description: String = "You do not have permission to access this module. Contact your HR administrator for authorization.",
+    actionLabel: String = "Go Back",
+    showBackButton: Boolean = true
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        OfficeMitraTopBar(title = "Access Restricted", showBackButton = true, onBackClick = onBackClick)
+        OfficeMitraTopBar(title = "Access Restricted", showBackButton = showBackButton, onBackClick = onBackClick)
         EmptyState(
-            title = "Access Denied",
-            description = "You do not have permission to access this module. Contact your HR administrator for authorization.",
+            title = title,
+            description = description,
             icon = AppIcons.Lock,
-            actionLabel = "Go Back",
+            actionLabel = actionLabel,
             onActionClick = onBackClick
         )
     }
@@ -61,7 +66,7 @@ fun SessionExpiredScreen(
         OfficeMitraTopBar(title = "Session Status")
         EmptyState(
             title = "Session Expired",
-            description = "Your session has expired due to inactivity. Please log in again to continue.",
+            description = "Your session has ended. Please log in again to continue.",
             icon = AppIcons.Timer,
             actionLabel = "Log In Again",
             onActionClick = onNavigateToLogin
@@ -71,7 +76,8 @@ fun SessionExpiredScreen(
 
 @Composable
 fun GenericErrorScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onRetryClick: () -> Unit = onBackClick
 ) {
     Column(
         modifier = Modifier
@@ -81,7 +87,7 @@ fun GenericErrorScreen(
         OfficeMitraTopBar(title = "Error", showBackButton = true, onBackClick = onBackClick)
         ErrorState(
             message = "An unexpected error occurred while loading this screen.",
-            onRetryClick = onBackClick
+            onRetryClick = onRetryClick
         )
     }
 }

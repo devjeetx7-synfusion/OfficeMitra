@@ -3,6 +3,9 @@ package com.officemitra.app.feature.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,20 +13,34 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.components.*
 import com.officemitra.app.core.theme.*
+import com.officemitra.app.data.auth.AuthValidator
+import com.officemitra.app.data.auth.PasswordStrength
+import com.officemitra.app.data.session.EntryDestination
 
 @Composable
 fun RegisterScreen(
-    onNavigateToHome: () -> Unit,
+    onAuthenticated: (EntryDestination) -> Unit,
     onNavigateToLogin: () -> Unit,
     onBackClick: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val focusManager = LocalFocusManager.current
+    val inputsEnabled = !uiState.isLoading
+    val submit = {
+        focusManager.clearFocus()
+        viewModel.register(onAuthenticated)
+    }
 
     Column(
         modifier = Modifier
@@ -61,13 +78,13 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (uiState.errorMessage != null) {
-                    InfoBanner(message = uiState.errorMessage ?: "")
+                uiState.errorMessage?.let { message ->
+                    AuthErrorBanner(message = message)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (uiState.infoMessage != null) {
-                    InfoBanner(message = uiState.infoMessage ?: "")
+                uiState.infoMessage?.let { message ->
+                    AuthInfoBanner(message = message)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
@@ -75,6 +92,12 @@ fun RegisterScreen(
                     PrimaryButton(
                         text = "Go to Login",
                         onClick = onNavigateToLogin
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlineButton(
+                        text = if (uiState.isResendingConfirmation) "Sending..." else "Resend Confirmation Email",
+                        onClick = viewModel::resendConfirmationEmail,
+                        enabled = !uiState.isResendingConfirmation
                     )
                 } else {
                     FormTextField(
@@ -84,7 +107,12 @@ fun RegisterScreen(
                         placeholder = "Alex Morgan",
                         leadingIcon = AppIcons.Person,
                         isError = uiState.nameError != null,
-                        errorMessage = uiState.nameError
+                        errorMessage = uiState.nameError,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Next
+                        ),
+                        enabled = inputsEnabled
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -96,7 +124,12 @@ fun RegisterScreen(
                         placeholder = "alex.morgan@officemitra.com",
                         leadingIcon = AppIcons.Email,
                         isError = uiState.emailError != null,
-                        errorMessage = uiState.emailError
+                        errorMessage = uiState.emailError,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        enabled = inputsEnabled
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -105,10 +138,15 @@ fun RegisterScreen(
                         value = uiState.mobileNumber,
                         onValueChange = viewModel::onMobileNumberChanged,
                         label = "Mobile Number",
-                        placeholder = "+1 555-019-2834",
+                        placeholder = "+91 98765 43210",
                         leadingIcon = AppIcons.Phone,
                         isError = uiState.mobileError != null,
-                        errorMessage = uiState.mobileError
+                        errorMessage = uiState.mobileError,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next
+                        ),
+                        enabled = inputsEnabled
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -118,16 +156,18 @@ fun RegisterScreen(
                         onValueChange = viewModel::onPasswordChanged,
                         label = "Password",
                         isError = uiState.passwordError != null,
-                        errorMessage = uiState.passwordError
+                        errorMessage = uiState.passwordError,
+                        enabled = inputsEnabled,
+                        imeAction = ImeAction.Next
                     )
 
                     // Password Strength Indicator
                     if (uiState.password.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        val strength = when {
-                            uiState.password.length < 6 -> "Weak" to ErrorLight
-                            uiState.password.length < 10 -> "Medium" to WarningLight
-                            else -> "Strong" to SuccessLight
+                        val strength = when (AuthValidator.passwordStrength(uiState.password)) {
+                            PasswordStrength.WEAK -> "Weak" to ErrorLight
+                            PasswordStrength.MEDIUM -> "Medium" to WarningLight
+                            PasswordStrength.STRONG -> "Strong" to SuccessLight
                         }
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -154,18 +194,33 @@ fun RegisterScreen(
                         onValueChange = viewModel::onConfirmPasswordChanged,
                         label = "Confirm Password",
                         isError = uiState.confirmPasswordError != null,
-                        errorMessage = uiState.confirmPasswordError
+                        errorMessage = uiState.confirmPasswordError,
+                        enabled = inputsEnabled,
+                        imeAction = ImeAction.Done,
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // The whole row toggles, so the label is part of the touch target and is read
+                    // together with the checkbox by screen readers.
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 48.dp)
+                            .toggleable(
+                                value = uiState.acceptTerms,
+                                enabled = inputsEnabled,
+                                role = Role.Checkbox,
+                                onValueChange = viewModel::onAcceptTermsChanged
+                            )
                     ) {
                         Checkbox(
                             checked = uiState.acceptTerms,
-                            onCheckedChange = viewModel::onAcceptTermsChanged,
+                            onCheckedChange = null,
+                            enabled = inputsEnabled,
+                            modifier = Modifier.padding(horizontal = 14.dp),
                             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                         Text(
@@ -174,9 +229,9 @@ fun RegisterScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    if (uiState.termsError != null) {
+                    uiState.termsError?.let { termsError ->
                         Text(
-                            text = uiState.termsError!!,
+                            text = termsError,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(start = 8.dp)
@@ -187,7 +242,7 @@ fun RegisterScreen(
 
                     PrimaryButton(
                         text = "Register",
-                        onClick = { viewModel.register(onNavigateToHome) },
+                        onClick = submit,
                         isLoading = uiState.isLoading
                     )
                 }
@@ -207,6 +262,7 @@ fun RegisterScreen(
                 )
                 TextButton(
                     onClick = onNavigateToLogin,
+                    enabled = inputsEnabled,
                     modifier = Modifier.defaultMinSize(minHeight = 48.dp)
                 ) {
                     Text(

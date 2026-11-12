@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface OfficeMitraRepository {
     val currentUser: StateFlow<User>
+
+    /** Company membership and account status of the signed-in user, as of the last refresh. */
+    val accountState: StateFlow<AccountState>
     val isPunchedIn: StateFlow<Boolean>
     val todayAttendance: StateFlow<AttendanceRecord>
     val attendanceHistory: StateFlow<List<AttendanceRecord>>
@@ -15,8 +18,17 @@ interface OfficeMitraRepository {
     val salarySlips: StateFlow<List<SalarySlip>>
     val notifications: StateFlow<List<AppNotification>>
 
+    /** Reloads everything for the signed-in user, or clears all cached data when nobody is signed in. */
     suspend fun refreshAll()
+
+    /** Drops every piece of cached user data. Called when the session ends. */
+    suspend fun clearSessionData()
     suspend fun loadUserProfile(): Result<User>
+
+    /**
+     * Updates the name and phone number of the signed-in user's own profile.
+     * [email] is not written: the email address belongs to the auth account and is kept in sync by the server.
+     */
     suspend fun updateProfile(name: String, email: String, phone: String): Result<Unit>
     suspend fun joinCompanyByCode(companyCode: String, department: String, designation: String, employeeId: String): Result<Unit>
     suspend fun createCompany(companyName: String, address: String): Result<Unit>

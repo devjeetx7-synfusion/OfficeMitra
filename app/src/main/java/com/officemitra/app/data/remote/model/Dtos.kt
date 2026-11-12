@@ -136,3 +136,18 @@ data class NotificationDto(
     @SerialName("target_route") val targetRoute: String? = null,
     @SerialName("created_at") val createdAt: String? = null
 )
+
+/** Columns a user may set when their own profile row has to be created from the app. */
+@Serializable
+data class ProfileInsertDto(
+    @SerialName("id") val id: String,
+    @SerialName("full_name") val fullName: String,
+    @SerialName("phone_number") val phoneNumber: String
+)
+
+/** Columns a user may change on their own profile. Email and account status are server-controlled. */
+@Serializable
+data class ProfileUpdateDto(
+    @SerialName("full_name") val fullName: String,
+    @SerialName("phone_number") val phoneNumber: String
+)

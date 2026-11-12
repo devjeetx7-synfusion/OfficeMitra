@@ -23,9 +23,11 @@ import com.officemitra.app.core.theme.AppIcons
 fun JoinCompanyScreen(
     onNavigateToStatus: () -> Unit,
     onBackClick: () -> Unit,
+    onLogout: () -> Unit = {},
     viewModel: JoinCompanyViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val inputsEnabled = !uiState.isLoading
 
     Column(
         modifier = Modifier
@@ -35,7 +37,10 @@ fun JoinCompanyScreen(
         OfficeMitraTopBar(
             title = "Join Company",
             showBackButton = true,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            actions = {
+                TextButton(onClick = onLogout, enabled = inputsEnabled) { Text("Log Out") }
+            }
         )
 
         Column(
@@ -85,7 +90,8 @@ fun JoinCompanyScreen(
                 placeholder = "e.g. OM-10245",
                 leadingIcon = AppIcons.QrCode,
                 isError = uiState.codeError != null,
-                errorMessage = uiState.codeError
+                errorMessage = uiState.codeError,
+                enabled = inputsEnabled
             )
 
             // Company Preview Card
@@ -129,7 +135,8 @@ fun JoinCompanyScreen(
                 onValueChange = viewModel::onEmployeeIdChanged,
                 label = "Employee ID (Optional)",
                 placeholder = "EMP-1024",
-                leadingIcon = AppIcons.Badge
+                leadingIcon = AppIcons.Badge,
+                enabled = inputsEnabled
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -138,7 +145,10 @@ fun JoinCompanyScreen(
                 value = uiState.fullName,
                 onValueChange = viewModel::onFullNameChanged,
                 label = "Full Name",
-                leadingIcon = AppIcons.Person
+                leadingIcon = AppIcons.Person,
+                isError = uiState.nameError != null,
+                errorMessage = uiState.nameError,
+                enabled = inputsEnabled
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -147,8 +157,24 @@ fun JoinCompanyScreen(
                 value = uiState.mobileNumber,
                 onValueChange = viewModel::onMobileChanged,
                 label = "Registered Mobile Number",
-                leadingIcon = AppIcons.Phone
+                leadingIcon = AppIcons.Phone,
+                isError = uiState.mobileError != null,
+                errorMessage = uiState.mobileError,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+                ),
+                enabled = inputsEnabled
             )
+
+            uiState.errorMessage?.let { message ->
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoBanner(
+                    message = message,
+                    icon = AppIcons.Error,
+                    backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
 
             Spacer(modifier = Modifier.height(28.dp))
 

@@ -14,28 +14,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.theme.AppIcons
 import com.officemitra.app.core.theme.BrandInk
 
+/**
+ * Shown while the stored session is restored. The destination is decided by `SessionViewModel`
+ * from the real session, so this screen has no navigation logic of its own.
+ */
 @Composable
-fun SplashScreen(
-    onNavigateToOnboarding: () -> Unit,
-    onNavigateToWelcome: () -> Unit,
-    onNavigateToHome: () -> Unit,
-    viewModel: SplashViewModel = hiltViewModel()
-) {
-    val destination by viewModel.destination.collectAsState()
-
-    LaunchedEffect(destination) {
-        when (destination) {
-            is SplashDestination.Onboarding -> onNavigateToOnboarding()
-            is SplashDestination.Welcome -> onNavigateToWelcome()
-            is SplashDestination.Home -> onNavigateToHome()
-            null -> {}
-        }
-    }
-
+fun SplashScreen() {
     val scale = remember { Animatable(0.5f) }
     val alpha = remember { Animatable(0f) }
 
