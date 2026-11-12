@@ -27,6 +27,14 @@ import com.officemitra.app.data.repository.AuthState
 import com.officemitra.app.data.session.EntryDestination
 import com.officemitra.app.feature.session.SessionViewModel
 
+/** Screens a signed-in user waits on until their account allows the dashboard. Never restored as-is. */
+private val waitingRoutes = setOf(
+    Screen.JoinCompany.route,
+    Screen.RegistrationStatus.route,
+    Screen.AccountSuspended.route,
+    Screen.ResetPassword.route
+)
+
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
@@ -48,7 +56,7 @@ fun MainScreen(
             val keepRestoredScreen = request.isStartup &&
                 request.destination == EntryDestination.HOME &&
                 current != null &&
-                current != Screen.Splash.route &&
+                current !in waitingRoutes &&
                 RouteAccess.requiresSession(current)
             if (!keepRestoredScreen) navController.navigateToEntry(request.destination)
         }
