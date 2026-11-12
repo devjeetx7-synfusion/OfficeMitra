@@ -37,8 +37,9 @@ object SupabaseModule {
             supabaseKey = BuildConfig.SUPABASE_PUBLISHABLE_KEY
         ) {
             // The library logs failed requests together with their headers, which include the
-            // user's access token. Nothing is logged in release builds.
-            defaultLogLevel = if (BuildConfig.DEBUG) LogLevel.INFO else LogLevel.NONE
+            // user's access token, so its logging is switched off in every build type. The app
+            // logs the failing step and the error category itself.
+            defaultLogLevel = LogLevel.NONE
             requestTimeout = 20.seconds
 
             install(Auth) {
