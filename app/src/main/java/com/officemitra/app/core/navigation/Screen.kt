@@ -7,6 +7,9 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object ForgotPassword : Screen("forgot_password")
+
+    /** Opened only from a password-reset email link. */
+    object ResetPassword : Screen("reset_password")
     object JoinCompany : Screen("join_company")
     object RegistrationStatus : Screen("registration_status")
 
@@ -40,7 +43,33 @@ sealed class Screen(val route: String) {
 
     // Supporting Error / Utility Screens
     object AccessDenied : Screen("access_denied")
+    object AccountSuspended : Screen("account_suspended")
     object SessionExpired : Screen("session_expired")
     object NoInternet : Screen("no_internet")
     object GenericError : Screen("generic_error")
+}
+
+/**
+ * Decides which routes need a signed-in user.
+ *
+ * The list names the routes that are public; every other route, including any added later, is
+ * protected by default.
+ */
+object RouteAccess {
+    private val publicRoutes: Set<String> by lazy {
+        setOf(
+            Screen.Splash.route,
+            Screen.Onboarding.route,
+            Screen.Welcome.route,
+            Screen.Login.route,
+            Screen.Register.route,
+            Screen.ForgotPassword.route,
+            Screen.AboutApp.route,
+            Screen.SessionExpired.route,
+            Screen.NoInternet.route,
+            Screen.GenericError.route
+        )
+    }
+
+    fun requiresSession(route: String?): Boolean = route != null && route !in publicRoutes
 }

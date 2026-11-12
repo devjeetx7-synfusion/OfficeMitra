@@ -3,6 +3,9 @@ package com.officemitra.app.ui
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,16 +16,64 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.officemitra.app.core.components.BottomNavItem
 import com.officemitra.app.core.components.FloatingNavigationDock
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.officemitra.app.core.navigation.AppNavGraph
+import com.officemitra.app.core.navigation.RouteAccess
 import com.officemitra.app.core.navigation.Screen
+import com.officemitra.app.core.navigation.navigateToEntry
+import com.officemitra.app.core.navigation.replaceAllWith
 import com.officemitra.app.core.theme.AppIcons
+import com.officemitra.app.data.repository.AuthState
+import com.officemitra.app.data.session.EntryDestination
+import com.officemitra.app.feature.session.SessionViewModel
+
+/** Screens a signed-in user waits on until their account allows the dashboard. Never restored as-is. */
+private val waitingRoutes = setOf(
+    Screen.JoinCompany.route,
+    Screen.RegistrationStatus.route,
+    Screen.AccountSuspended.route,
+    Screen.ResetPassword.route
+)
 
 @Composable
 fun MainScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val authState by sessionViewModel.authState.collectAsState()
+    val sessionNotice by sessionViewModel.notice.collectAsState()
+    val isSessionBusy by sessionViewModel.isBusy.collectAsState()
+
+    // Session-driven navigation: app start, email links and "retry".
+    LaunchedEffect(navController) {
+        sessionViewModel.navigation.collect { request ->
+            val current = navController.currentDestination?.route
+            // After the system restored a screen inside the app, an unchanged "you belong in the
+            // app" decision must not reset the user to the dashboard.
+            val keepRestoredScreen = request.isStartup &&
+                request.destination == EntryDestination.HOME &&
+                current != null &&
+                current !in waitingRoutes &&
+                RouteAccess.requiresSession(current)
+            if (!keepRestoredScreen) navController.navigateToEntry(request.destination)
+        }
+    }
+
+    // Route guard: a protected screen is never left on display once the session is gone, whatever
+    // ended it (logout, expiry, revoked refresh token).
+    LaunchedEffect(authState, currentRoute) {
+        if (authState is AuthState.SignedOut && RouteAccess.requiresSession(currentRoute)) {
+            val target = if (sessionViewModel.consumeSessionExpired()) {
+                Screen.SessionExpired.route
+            } else {
+                Screen.Welcome.route
+            }
+            navController.replaceAllWith(target)
+        }
+    }
 
     val bottomNavItems = listOf(
         BottomNavItem(
@@ -60,7 +111,10 @@ fun MainScreen(
     ) {
         AppNavGraph(
             navController = navController,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            onSignOut = sessionViewModel::signOut,
+            onRetryEntry = sessionViewModel::retryEntry,
+            isSessionBusy = isSessionBusy
         )
 
         AnimatedVisibility(
@@ -94,5 +148,15 @@ fun MainScreen(
                 }
             )
         }
+    }
+
+    sessionNotice?.let { message ->
+        AlertDialog(
+            onDismissRequest = sessionViewModel::dismissNotice,
+            confirmButton = {
+                TextButton(onClick = sessionViewModel::dismissNotice) { Text("OK") }
+            },
+            text = { Text(message) }
+        )
     }
 }

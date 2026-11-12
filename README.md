@@ -9,7 +9,7 @@ Office Mitra is a modern, production-grade native Android workforce management a
 - **UI Framework**: Jetpack Compose
 - **Design System**: Material 3 Design System
 - **Backend Infrastructure**: Supabase (Auth, PostgreSQL Database, Row Level Security, Storage, Realtime)
-- **Supabase Kotlin SDK**: `io.github.jan-tennert.supabase` (GoTrue, Postgrest, Storage, Realtime v2.1.0)
+- **Supabase Kotlin SDK**: `io.github.jan-tennert.supabase` (GoTrue, Postgrest, Storage, Realtime v2.2.3)
 - **HTTP Client**: Ktor CIO (`io.ktor:ktor-client-cio`)
 - **JSON Serialization**: `kotlinx-serialization-json`
 - **Architecture**: MVVM Architecture with Clean Repository Pattern
@@ -72,12 +72,28 @@ Apply the migration script to your Supabase PostgreSQL database using the Supaba
 # Using Supabase CLI
 supabase db push
 ```
-Or paste the contents of `supabase/migrations/00001_initial_schema.sql` into the Supabase Dashboard **SQL Editor** and run it.
+Or paste the migration files into the Supabase Dashboard **SQL Editor** and run them in order:
+
+1. `supabase/migrations/00001_initial_schema.sql` (first-time setup only; it cannot be run twice)
+2. `supabase/migrations/00002_auth_security_hardening.sql` (safe to run more than once; changes policies and functions only, never data)
+
+Apply `00002` together with the app version that contains it: it replaces the "any signed-in user can read all companies" policy with the `lookup_company_by_code()` function, which older app builds do not call.
 
 ### 3. Authentication Configuration
-In your Supabase Dashboard under **Authentication > Providers**:
-1. Enable **Email / Password** authentication.
-2. (Optional) Disable email confirmation requirement for instant sign-in, or configure site URL redirect for password recovery flows.
+In your Supabase Dashboard:
+
+1. **Authentication > Providers**: enable **Email** (email + password).
+2. **Authentication > URL Configuration > Redirect URLs**: add both of these, exactly as written. Without them the links in confirmation and password-reset emails cannot open the app:
+   - `officemitra://auth-callback/confirm`
+   - `officemitra://auth-callback/recovery`
+3. Email confirmation may be left on or switched off; the app handles both. With confirmation on, a new user must open the emailed link before logging in.
+4. Only the **publishable (anon) key** belongs in the app. Never put the `service_role` / secret key in `local.properties`, Gradle properties or CI variables used for the app build; the Gradle script rejects any key that is not a publishable key.
+
+### 4. How the app handles the session
+- The Supabase session is the only source of truth. It is stored on the device by the Supabase SDK, restored when the app starts, refreshed automatically, and excluded from device backups.
+- Every screen except splash, onboarding, welcome, login, register and forgot-password requires a session. When the session ends for any reason the app leaves those screens immediately.
+- With **Remember Me** switched off at login, the session is discarded the next time the app process starts.
+- After login the app loads the account and routes by company membership: approved → dashboard, pending or rejected → status screen, none → join company.
 
 ---
 

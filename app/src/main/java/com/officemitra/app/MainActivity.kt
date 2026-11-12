@@ -1,11 +1,13 @@
 package com.officemitra.app
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.officemitra.app.core.theme.OfficeMitraTheme
 import com.officemitra.app.data.preferences.UserPreferences
+import com.officemitra.app.feature.session.SessionViewModel
 import com.officemitra.app.ui.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -26,9 +29,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userPreferences: UserPreferences
 
+    private val sessionViewModel: SessionViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // A recreated activity (rotation, process restore) gets the same intent again; the link
+        // inside it was already used and can only be exchanged once.
+        if (savedInstanceState == null) handleAuthLink(intent)
         setContent {
             val themeMode by userPreferences.themeMode.collectAsState(initial = "SYSTEM")
             val isDarkTheme = when (themeMode) {
@@ -56,9 +64,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(sessionViewModel = sessionViewModel)
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleAuthLink(intent)
+    }
+
+    /** Email confirmation and password-reset links come back as `officemitra://auth-callback/...`. */
+    private fun handleAuthLink(intent: Intent?) {
+        if (intent?.action != Intent.ACTION_VIEW) return
+        sessionViewModel.onAuthLink(intent.dataString)
     }
 }

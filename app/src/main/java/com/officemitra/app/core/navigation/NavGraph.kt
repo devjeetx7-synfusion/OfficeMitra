@@ -1,7 +1,9 @@
 package com.officemitra.app.core.navigation
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,35 +33,35 @@ import com.officemitra.app.feature.supporting.GenericErrorScreen
 import com.officemitra.app.feature.supporting.NoInternetScreen
 import com.officemitra.app.feature.supporting.SessionExpiredScreen
 
+/**
+ * @param onSignOut ends the session; the route guard in `MainScreen` then leaves the protected area.
+ * @param onRetryEntry re-evaluates the session and account and navigates to where the user belongs.
+ * @param isSessionBusy true while one of the two actions above is running.
+ */
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSignOut: () -> Unit = {},
+    onRetryEntry: () -> Unit = {},
+    isSessionBusy: Boolean = false
 ) {
+    val activity = LocalContext.current as? Activity
+
+    // When a screen is the only one on the stack, popping it would leave an empty window.
+    // "Back" then does what the system back button does there: it leaves the app.
+    val backOrExit: () -> Unit = {
+        if (navController.previousBackStackEntry != null) navController.popBackStack() else activity?.finish()
+    }
+
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
-        // Splash
+        // Splash: the destination is decided from the restored session by SessionViewModel.
         composable(Screen.Splash.route) {
-            SplashScreen(
-                onNavigateToOnboarding = {
-                    navController.navigate(Screen.Onboarding.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToWelcome = {
-                    navController.navigate(Screen.Welcome.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                }
-            )
+            SplashScreen()
         }
 
         // Onboarding
@@ -76,9 +78,11 @@ fun AppNavGraph(
         // Welcome
         composable(Screen.Welcome.route) {
             WelcomeScreen(
-                onNavigateToLogin = { navController.navigate(Screen.Login.route) },
-                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                onNavigateToJoinCompany = { navController.navigate(Screen.JoinCompany.route) },
+                onNavigateToLogin = { navController.navigate(Screen.Login.route) { launchSingleTop = true } },
+                onNavigateToRegister = { navController.navigate(Screen.Register.route) { launchSingleTop = true } },
+                // Joining a company needs an account. After registration or login, a user without a
+                // company is taken to the join screen automatically.
+                onNavigateToJoinCompany = { navController.navigate(Screen.Register.route) { launchSingleTop = true } },
                 onNavigateToTerms = { navController.navigate(Screen.AboutApp.route) }
             )
         }
@@ -86,54 +90,63 @@ fun AppNavGraph(
         // Login
         composable(Screen.Login.route) {
             LoginScreen(
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                onAuthenticated = { destination -> navController.navigateToEntry(destination) },
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route) {
+                        popUpTo(Screen.Welcome.route)
+                        launchSingleTop = true
                     }
                 },
-                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) },
-                onBackClick = { navController.popBackStack() }
+                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) { launchSingleTop = true } },
+                onBackClick = { navController.backOr(Screen.Welcome.route) }
             )
         }
 
         // Register
         composable(Screen.Register.route) {
             RegisterScreen(
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                onAuthenticated = { destination -> navController.navigateToEntry(destination) },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Welcome.route)
+                        launchSingleTop = true
                     }
                 },
-                onNavigateToLogin = { navController.navigate(Screen.Login.route) },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.backOr(Screen.Welcome.route) }
             )
         }
 
         // Forgot Password
         composable(Screen.ForgotPassword.route) {
             ForgotPasswordScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.backOr(Screen.Welcome.route) }
+            )
+        }
+
+        // Reset Password: reachable only through a password-reset email link.
+        composable(Screen.ResetPassword.route) {
+            ChangePasswordScreen(
+                onBackClick = onRetryEntry,
+                isRecovery = true
             )
         }
 
         // Join Company
         composable(Screen.JoinCompany.route) {
             JoinCompanyScreen(
-                onNavigateToStatus = { navController.navigate(Screen.RegistrationStatus.route) },
-                onBackClick = { navController.popBackStack() }
+                onNavigateToStatus = { navController.replaceAllWith(Screen.RegistrationStatus.route) },
+                onBackClick = backOrExit,
+                onLogout = onSignOut
             )
         }
 
         // Registration Status
         composable(Screen.RegistrationStatus.route) {
             RegistrationStatusScreen(
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Welcome.route) { inclusive = true }
-                    }
-                },
-                onBackClick = { navController.popBackStack() }
+                onNavigateToHome = { navController.replaceAllWith(Screen.Home.route) },
+                onBackClick = backOrExit,
+                onLogout = onSignOut,
+                onNavigateToJoinCompany = { navController.replaceAllWith(Screen.JoinCompany.route) }
             )
         }
 
@@ -172,11 +185,9 @@ fun AppNavGraph(
                 onNavigateToAppSettings = { navController.navigate(Screen.AppSettings.route) },
                 onNavigateToAboutApp = { navController.navigate(Screen.AboutApp.route) },
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
-                onLogout = {
-                    navController.navigate(Screen.Welcome.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
+                // Kept for the screen's signature. Leaving the app after logout is done by the
+                // route guard in MainScreen, which reacts to the session itself.
+                onLogout = {}
             )
         }
 
@@ -294,23 +305,40 @@ fun AppNavGraph(
 
         // Supporting Screens
         composable(Screen.AccessDenied.route) {
-            AccessDeniedScreen(onBackClick = { navController.popBackStack() })
+            AccessDeniedScreen(onBackClick = { navController.backOr(Screen.Home.route) })
+        }
+
+        composable(Screen.AccountSuspended.route) {
+            AccessDeniedScreen(
+                onBackClick = onSignOut,
+                title = "Account Disabled",
+                description = "Your account has been disabled. Please contact your HR administrator.",
+                actionLabel = "Log Out",
+                showBackButton = false
+            )
         }
 
         composable(Screen.SessionExpired.route) {
             SessionExpiredScreen(onNavigateToLogin = {
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+                // Keep Welcome underneath so that "back" from the login form has somewhere to go.
+                navController.replaceAllWith(Screen.Welcome.route)
+                navController.navigate(Screen.Login.route) { launchSingleTop = true }
             })
         }
 
         composable(Screen.NoInternet.route) {
-            NoInternetScreen(onRetryClick = { navController.popBackStack() }, onBackClick = { navController.popBackStack() })
+            NoInternetScreen(
+                onRetryClick = onRetryEntry,
+                onBackClick = backOrExit,
+                isRetrying = isSessionBusy
+            )
         }
 
         composable(Screen.GenericError.route) {
-            GenericErrorScreen(onBackClick = { navController.popBackStack() })
+            GenericErrorScreen(
+                onBackClick = backOrExit,
+                onRetryClick = onRetryEntry
+            )
         }
     }
 }

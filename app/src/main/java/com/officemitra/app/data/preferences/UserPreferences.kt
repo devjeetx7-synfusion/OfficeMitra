@@ -21,7 +21,10 @@ class UserPreferences @Inject constructor(
 ) {
     private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     private val DARK_MODE_THEME = stringPreferencesKey("dark_mode_theme") // "LIGHT", "DARK", "SYSTEM"
-    private val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+    private val KEEP_SIGNED_IN = booleanPreferencesKey("keep_signed_in")
+
+    // Removed: the Supabase session is the only record of whether a user is signed in.
+    private val LEGACY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
 
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data
         .map { preferences -> preferences[ONBOARDING_COMPLETED] ?: false }
@@ -29,8 +32,9 @@ class UserPreferences @Inject constructor(
     val themeMode: Flow<String> = context.dataStore.data
         .map { preferences -> preferences[DARK_MODE_THEME] ?: "SYSTEM" }
 
-    val isLoggedIn: Flow<Boolean> = context.dataStore.data
-        .map { preferences -> preferences[IS_LOGGED_IN] ?: false }
+    /** False when the last login had "Remember Me" switched off; the session then ends with the app. */
+    val keepSignedIn: Flow<Boolean> = context.dataStore.data
+        .map { preferences -> preferences[KEEP_SIGNED_IN] ?: true }
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
         context.dataStore.edit { preferences ->
@@ -44,9 +48,10 @@ class UserPreferences @Inject constructor(
         }
     }
 
-    suspend fun setLoggedIn(loggedIn: Boolean) {
+    suspend fun setKeepSignedIn(keep: Boolean) {
         context.dataStore.edit { preferences ->
-            preferences[IS_LOGGED_IN] = loggedIn
+            preferences[KEEP_SIGNED_IN] = keep
+            preferences.remove(LEGACY_IS_LOGGED_IN)
         }
     }
 }

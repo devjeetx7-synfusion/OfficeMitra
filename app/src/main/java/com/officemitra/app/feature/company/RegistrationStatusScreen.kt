@@ -21,9 +21,12 @@ import com.officemitra.app.data.model.ApprovalStatus
 fun RegistrationStatusScreen(
     onNavigateToHome: () -> Unit,
     onBackClick: () -> Unit,
+    onLogout: () -> Unit = {},
+    onNavigateToJoinCompany: () -> Unit = onBackClick,
     viewModel: RegistrationStatusViewModel = hiltViewModel()
 ) {
     val user by viewModel.currentUser.collectAsState()
+    val statusState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -33,7 +36,10 @@ fun RegistrationStatusScreen(
         OfficeMitraTopBar(
             title = "Registration Status",
             showBackButton = true,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            actions = {
+                TextButton(onClick = onLogout) { Text("Log Out") }
+            }
         )
 
         Column(
@@ -116,9 +122,20 @@ fun RegistrationStatusScreen(
                     }
 
                     Column(modifier = Modifier.fillMaxWidth()) {
+                        statusState.errorMessage?.let { message ->
+                            Text(
+                                text = message,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+
                         OutlineButton(
-                            text = "Refresh Status",
-                            onClick = { viewModel.refreshStatus() }
+                            text = if (statusState.isRefreshing) "Checking..." else "Refresh Status",
+                            enabled = !statusState.isRefreshing,
+                            onClick = { viewModel.refreshStatus(onNoMembership = onNavigateToJoinCompany) }
                         )
                     }
                 }
@@ -207,7 +224,7 @@ fun RegistrationStatusScreen(
 
                     OutlineButton(
                         text = "Back to Join Company",
-                        onClick = onBackClick
+                        onClick = onNavigateToJoinCompany
                     )
                 }
             }

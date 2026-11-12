@@ -61,7 +61,7 @@ android {
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.8" }
-    packaging { resources { excludes += "/META-INDEX/AL2.0"; excludes += "/META-INDEX/LGPL2.1" } }
+    packaging { resources { excludes += "/META-INF/AL2.0"; excludes += "/META-INF/LGPL2.1" } }
 }
 
 dependencies {

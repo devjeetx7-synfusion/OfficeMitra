@@ -462,12 +462,14 @@ fun FormTextField(
     readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    enabled: Boolean = true
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            enabled = enabled,
             label = { Text(label) },
             placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
             leadingIcon = leadingIcon?.let {
@@ -550,8 +552,12 @@ fun PasswordTextField(
     label: String = "Password",
     modifier: Modifier = Modifier,
     isError: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    enabled: Boolean = true,
+    imeAction: androidx.compose.ui.text.input.ImeAction = androidx.compose.ui.text.input.ImeAction.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
+    // Deliberately not saved across process death: the visibility toggle resets to hidden.
     var passwordVisible by remember { mutableStateOf(false) }
 
     FormTextField(
@@ -576,9 +582,12 @@ fun PasswordTextField(
         isError = isError,
         errorMessage = errorMessage,
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Password,
+            imeAction = imeAction
         ),
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
+        keyboardActions = keyboardActions,
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        enabled = enabled
     )
 }
 

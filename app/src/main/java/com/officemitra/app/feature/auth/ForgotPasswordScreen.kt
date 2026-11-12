@@ -54,8 +54,8 @@ fun ForgotPasswordScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                if (uiState.errorMessage != null) {
-                    InfoBanner(message = uiState.errorMessage ?: "")
+                uiState.errorMessage?.let { message ->
+                    AuthErrorBanner(message = message)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
@@ -65,7 +65,17 @@ fun ForgotPasswordScreen(
                         onValueChange = viewModel::onEmailChanged,
                         label = "Email Address",
                         placeholder = "user@company.com",
-                        leadingIcon = AppIcons.Email
+                        leadingIcon = AppIcons.Email,
+                        isError = uiState.emailError != null,
+                        errorMessage = uiState.emailError,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Email,
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                        ),
+                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                            onDone = { viewModel.sendPasswordReset() }
+                        ),
+                        enabled = !uiState.isLoading
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -76,8 +86,10 @@ fun ForgotPasswordScreen(
                         isLoading = uiState.isLoading
                     )
                 } else {
-                    InfoBanner(
-                        message = "Password reset link sent! Please check your email inbox."
+                    AuthInfoBanner(
+                        message = "If an account exists for ${uiState.email.trim()}, a password reset link is on its way. " +
+                            "Open the link on this phone to choose a new password. " +
+                            "Check your spam folder if it doesn't arrive within a few minutes."
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -85,6 +97,13 @@ fun ForgotPasswordScreen(
                     OutlineButton(
                         text = "Back to Login",
                         onClick = onBackClick
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlineButton(
+                        text = "Use a Different Email",
+                        onClick = viewModel::editEmail
                     )
                 }
             }

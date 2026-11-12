@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and lower. The Supabase session (access and refresh token) is kept in shared
+     preferences and must never leave the device through a backup. -->
 <full-backup-content>
+    <exclude domain="sharedpref" path="." />
 </full-backup-content>

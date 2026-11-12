@@ -15,8 +15,8 @@ coroutines = "1.7.3"
 junit = "4.13.2"
 junitExt = "1.1.5"
 espresso = "3.5.1"
-supabase = "2.1.0"
-ktor = "2.3.8"
+supabase = "2.2.3"
+ktor = "2.3.9"
 kotlinxSerialization = "1.6.2"
 
 [libraries]
